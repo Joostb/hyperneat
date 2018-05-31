@@ -1,5 +1,21 @@
-# hyperneat
+# HyperNEAT
 A repo for the NC course
+
+# Installation
+Required packages are numpy and pygame.
+
+Pygame installation:
+* Unix
+```bash
+sudo python3 -m pip install -U pygame --user
+```
+
+* Windows
+```bash
+python -m pip install -U pygame --user
+```
+
+If this does not work you have to [compile from source](https://www.pygame.org/wiki/MingW?parent=).
 
 # Plan
 We want to implement HyperNeat.
