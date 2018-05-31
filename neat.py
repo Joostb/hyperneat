@@ -1,7 +1,9 @@
-
+from copy import deepcopy
 
 import numpy as np
-from copy import deepcopy
+
+import visualization
+
 
 class Genome:
     def __init__(self):
@@ -21,10 +23,9 @@ class Genome:
             if sensor == 'sensor':
                 for j, output in enumerate(self.nodes):
                     if output == 'output':
-                        weight =  np.random.rand()
+                        weight = np.random.rand()
 
                         self.genes.append(Gene(i, j, weight, True, self.innovation()))
-
 
     def innovation(self):
         self.innovation_number += 1
@@ -37,11 +38,10 @@ class Genome:
         nodes = deepcopy(self.nodes)
         nodes = np.random.permutation(list(enumerate(nodes)))
 
-
         for index, in_node in nodes:
 
             for gene in self.genes:
-                if gene.in_node != index and in_node != 'sensor': # can there be loops 4 -> 4
+                if gene.in_node != index and in_node != 'sensor':  # can there be loops 4 -> 4
                     new_gene = Gene(int(index), out_node, np.random.rand(), True, innovation_number)
                     self.genes.append(new_gene)
                     return new_gene
@@ -58,18 +58,15 @@ class Genome:
         new_gene_out = Gene(node, connection.out, connection.weight, True, innovation_number + 1)
 
         self.genes.append(new_gene_in)
-        self.genes.append((new_gene_out))
+        self.genes.append(new_gene_out)
 
         return new_gene_in, new_gene_out
-
-
 
     def evaluate_input(self, inputs):
 
         network_old = np.zeros(len(self.nodes))
         for i, value in enumerate(inputs):
             network_old[i] = value
-
 
         for i in range(10):
             # calculate the input values for all network nodes
@@ -80,25 +77,20 @@ class Genome:
 
             network_old = deepcopy(network_new)
 
-
         return network_new
-
-
 
     def step_network_evaluation(self, network_old):
         network_new = np.zeros(len(network_old))
 
-
-
         for gene in self.genes:
             network_new[gene.out] += network_old[gene.in_node] * gene.weight * gene.enabled
 
-
         return network_new
+
 
 class Gene:
 
-    def __init__(self, in_node, out, weight,  enabled:bool, innov):
+    def __init__(self, in_node, out, weight, enabled: bool, innov):
         self.in_node = in_node
         self.out = out
         self.weight = weight
@@ -110,7 +102,6 @@ class Gene:
 
 
 def crossover(parent_1, parent_2, fitness_1, fitness_2):
-
     # determine the fittest parent
     if fitness_2 > fitness_1:
         fit_parent = deepcopy(parent_2)
@@ -120,14 +111,13 @@ def crossover(parent_1, parent_2, fitness_1, fitness_2):
     child_genes = cross_genes(parent_1, parent_2)
 
     # how do we know the nodes?
-    child_nodes  = generate_nodes(child_genes)
+    child_nodes = generate_nodes(child_genes)
 
     child_genome = Genome()
     child_genome.genes = child_genes
     child_genome.nodes = child_nodes
 
     return child_genome
-
 
 
 def generate_nodes(genes):
@@ -139,7 +129,8 @@ def generate_nodes(genes):
     """
     pass
 
-def cross_genes(parent_1:Genome, parent_2:Genome):
+
+def cross_genes(parent_1: Genome, parent_2: Genome):
     # assume p_1 is the fittest parent
     # this function tries to cross parent 1 and 2 into a new child!
 
@@ -150,9 +141,7 @@ def cross_genes(parent_1:Genome, parent_2:Genome):
     matching_genes_prob = 0.5
     while True:
 
-
         if p_1 >= len(parent_1.genes):
-
             # we have taken all interesting parts of the fittest genome
             # there are no more overlapping parts
             # so we are done!
@@ -184,36 +173,34 @@ def cross_genes(parent_1:Genome, parent_2:Genome):
             p_1 += 1
 
 
-genome = Genome()
-genome.initialize(6,5)
+if __name__ == "__main__":
+    genome = Genome()
+    genome.initialize(6, 5)
+    visualization.plot_genome(genome)
 
-genome_2 = Genome()
-genome_2.initialize(6,5)
+    genome_2 = Genome()
+    genome_2.initialize(6, 5)
 
-innovation_number = genome_2.innovation_number
+    innovation_number = genome_2.innovation_number
 
+    for i in range(3):
+        genome.add_connection(innovation_number)
+        innovation_number += 1
 
-for i in range(3):
+    genome.add_node(innovation_number)
 
-    genome.add_connection(innovation_number)
-    innovation_number += 1
+    cross_genes(genome_2, genome)
 
+    print('network')
+    inputs = np.random.normal(size=(5,))
+    print(inputs)
+    print(genome.evaluate_input(inputs))
 
+    # print(genome.nodes)
+    # print(genome.innovation_number)
+    # # print((genome.genes))
+    ([print(gene) for gene in genome.genes])
 
-genome.add_node(innovation_number)
-cross_genes(genome_2, genome)
-
-print('network')
-inputs = np.random.normal(size=(5,))
-print(inputs)
-print(genome.evaluate_input(inputs))
-
-# print(genome.nodes)
-# print(genome.innovation_number)
-# # print((genome.genes))
-([print(gene) for gene in genome.genes])
-
-# todo complete the crossover step, and check if it works
-# todo crossover
-# todo network evaluation
-# todo nice graph printing function
+    # todo complete the crossover step, and check if it works
+    # todo crossover
+    # todo network evaluation
