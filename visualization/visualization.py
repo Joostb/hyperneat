@@ -1,14 +1,14 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
-from neat import Genome
+from neat.genome import Genome
 
 
 def plot_genome(genome: Genome):
     G = nx.DiGraph()
 
     for node_nr, _ in enumerate(genome.nodes):
-        G.add_node(node_nr)
+        G.add_node(node_nr, pos=(0.1, 0.1))
 
     for gene in genome.genes:
         if gene.enabled:
