@@ -12,20 +12,22 @@ def plot_genome(genome: Genome):
     rest = []
     for node_nr, node in enumerate(genome.nodes):
         color_map = []
-        if node == 'sensor':
+        if node[1] == 'sensor':
             color_map.append(0)
-            sensor_list.append(node_nr)
+            sensor_list.append(node[0])
             attr_dict = {'pos': (00, 0.1)}
-        elif node == 'output':
+        elif node[1] == 'output':
             color_map.append(1)
-            output_list.append(node_nr)
+            output_list.append(node[0])
             attr_dict = {'pos': (0.5, 0.1)}
 
         else:
-            rest.append(node_nr)
+            rest.append(node[0])
             color_map.append(2)
 
-        G.add_node(node_nr)
+        G.add_node(node[0])
+        
+
 
 
     for gene in genome.genes:
@@ -54,6 +56,7 @@ def plot_genome(genome: Genome):
 if __name__ == "__main__":
     genome = Genome()
     genome.initialize(6, 5)
+    
     for i in range(20):
 
         genome.add_node(101)

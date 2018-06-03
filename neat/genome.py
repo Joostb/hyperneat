@@ -14,13 +14,18 @@ class Genome:
         self.innovation_number = 0
 
     def initialize(self, n_in, n_out):
-        self.nodes = ['sensor'] * n_in
-        self.nodes += ['output'] * n_out
+        
+        self.nodes = []        
+        for i in range(n_in):
+            self.nodes += [(i, 'sensor')]
+            
+        for i in range(n_in, n_in+n_out):
+            self.nodes += [(i, 'output')] 
 
         for i, sensor in enumerate(self.nodes):
-            if sensor == 'sensor':
+            if sensor[1] == 'sensor':
                 for j, output in enumerate(self.nodes):
-                    if output == 'output':
+                    if output[1] == 'output':
                         weight = np.random.rand()
 
                         self.genes.append(Gene(i, j, weight, True, self.innovation()))
@@ -34,12 +39,12 @@ class Genome:
         out_node = np.random.choice(len(self.nodes))
 
         nodes = deepcopy(self.nodes)
-        nodes = np.random.permutation(list(enumerate(nodes)))
+        nodes = np.random.permutation(nodes)
 
         for index, in_node in nodes:
 
             for gene in self.genes:
-                if gene.in_node != index and in_node != 'sensor':  # can there be loops 4 -> 4
+                if gene.in_node != index and in_node[1] != 'sensor':  # can there be loops 4 -> 4
                     new_gene = Gene(int(index), out_node, np.random.rand(), True, innovation_number)
                     self.genes.append(new_gene)
                     return new_gene
@@ -48,12 +53,12 @@ class Genome:
         connection = np.random.choice(self.genes)
         connection.enabled = False
 
-        self.nodes.append('hidden')
+        node = (len(self.nodes) - 1, 'hidden')
 
-        node = len(self.nodes) - 1
-
-        new_gene_in = Gene(connection.in_node, node, 1, True, innovation_number)
-        new_gene_out = Gene(node, connection.out, connection.weight, True, innovation_number + 1)
+        self.nodes.append(node)
+        
+        new_gene_in = Gene(connection.in_node, node[0], 1, True, innovation_number)
+        new_gene_out = Gene(node[0], connection.out, connection.weight, True, innovation_number + 1)
 
         self.genes.append(new_gene_in)
         self.genes.append(new_gene_out)

@@ -16,7 +16,7 @@ def crossover(parent_1, parent_2, fitness_1, fitness_2):
     child_genes = cross_genes(parent_1, parent_2)
 
     # how do we know the nodes?
-    child_nodes = generate_nodes(child_genes)
+    child_nodes = generate_nodes(child_genes, parent_1, parent_2)
 
     child_genome = Genome()
     child_genome.genes = child_genes
@@ -25,14 +25,37 @@ def crossover(parent_1, parent_2, fitness_1, fitness_2):
     return child_genome
 
 
-def generate_nodes(genes):
+def generate_nodes(genes, parent_1, parent_2):
     """
     Loop through all genes, and find out what nodes are used, and their type
 
     :param genome:
     :return:
     """
-    pass
+    nodes = []
+    index_node = []
+    for gene in genes: 
+        if gene.in_node not in index_node:
+            index_node.append(gene.in_node)
+        if gene.out not in index_node:
+            index_node.append(gene.out)
+    
+    find = False 
+    for index in index_node:
+        for node in parent_1.nodes:
+            if index == node[0] and node not in nodes:
+                nodes.append(node)
+                find = True 
+        
+        if find == False :
+            for node in parent_2.nodes and node not in nodes:
+                if index == node[0]:
+                    nodes.append(node)
+                
+        find = False 
+            
+    return nodes 
+        
 
 
 def cross_genes(parent_1: Genome, parent_2: Genome):
@@ -80,6 +103,30 @@ def cross_genes(parent_1: Genome, parent_2: Genome):
 
 if __name__ == "__main__":
     genome = Genome()
+    genome.initialize(3, 2)
+    
+    genome.add_node(20)
+    genome.add_connection(21)
+    #plot_genome(genome)
+    
+    genome_2 = Genome()
+    genome_2.initialize(3, 2)
+    #plot_genome(genome_2)
+    
+    child = crossover(genome, genome_2, 0.5, 0.5)
+    
+    plot_genome(child)
+    print('parent 1')
+    ([print(gene) for gene in genome.genes])
+    ([print(gene) for gene in genome.nodes])
+    print('parent 2')
+    ([print(gene) for gene in genome_2.genes])
+    ([print(gene) for gene in genome_2.nodes])
+    print('child')
+    ([print(gene) for gene in child.genes])
+    ([print(gene) for gene in child.nodes])
+    
+    '''genome = Genome()
     genome.initialize(6, 5)
     plot_genome(genome)
 
@@ -104,7 +151,7 @@ if __name__ == "__main__":
     # print(genome.nodes)
     # print(genome.innovation_number)
     # # print((genome.genes))
-    ([print(gene) for gene in genome.genes])
+    ([print(gene) for gene in genome.genes])'''
 
     # todo complete the crossover step, and check if it works
     # todo crossover
