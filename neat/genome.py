@@ -68,6 +68,14 @@ class Genome:
 
         return new_gene_in, new_gene_out
 
+    def mutate_weights(self):
+        for gene in self.genes:
+            if np.random.rand() <0.9:
+                gene.weight += np.random.normal(scale=0.01)
+            else:
+                gene.weight = np.random.normal()
+
+
     def evaluate_input(self, inputs):
 
         network_old = np.zeros(len(self.nodes))
