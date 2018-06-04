@@ -15,6 +15,9 @@ class Genome:
 
     def initialize(self, n_in, n_out):
         
+        self.nb_sensor = n_in
+        self.nb_output = n_out
+        
         self.nodes = []        
         for i in range(n_in):
             self.nodes += [(i, 'sensor')]
@@ -53,7 +56,7 @@ class Genome:
         connection = np.random.choice(self.genes)
         connection.enabled = False
 
-        node = (len(self.nodes) - 1, 'hidden')
+        node = (len(self.nodes), 'hidden')
 
         self.nodes.append(node)
         

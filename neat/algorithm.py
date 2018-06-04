@@ -34,25 +34,21 @@ def generate_nodes(genes, parent_1, parent_2):
     """
     nodes = []
     index_node = []
-    for gene in genes: 
+    for gene in genes:         
         if gene.in_node not in index_node:
             index_node.append(gene.in_node)
         if gene.out not in index_node:
             index_node.append(gene.out)
+            
+    nb_nodes = len(index_node)
     
-    find = False 
-    for index in index_node:
-        for node in parent_1.nodes:
-            if index == node[0] and node not in nodes:
-                nodes.append(node)
-                find = True 
-        
-        if find == False :
-            for node in parent_2.nodes and node not in nodes:
-                if index == node[0]:
-                    nodes.append(node)
-                
-        find = False 
+    for i in range(nb_nodes):
+        if i < parent_1.nb_sensor:
+            nodes.append((i, 'sensor'))
+        elif i <= parent_1.nb_output+parent_1.nb_sensor:
+            nodes.append((i, 'output'))
+        else :
+             nodes.append((i, 'hidden'))
             
     return nodes 
         
