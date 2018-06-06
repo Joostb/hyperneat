@@ -11,13 +11,13 @@ def evolve():
     output = 5
     genomes = [Genome() for _ in range(100)]
     [g.initialize(input, output) for g in genomes]
-    generations = 100
+    generations = 20
     representatives = []
 
     delta_t = 3.0
     innovation_number = 100
 
-    for i in range(generations):
+    for k in range(generations):
         species = [[] for _ in representatives]
         children = []
         for genome in genomes:
@@ -31,12 +31,7 @@ def evolve():
                 representatives.append(genome)
                 species.append([genome])
 
-
-
         genome_fitness = [fitness(g) for g in genomes]
-
-
-
 
 
         for specy in species:
@@ -59,9 +54,9 @@ def evolve():
                 if np.random.rand() < 0.25:
                     if np.random.rand() < 0.001:
                         # todo change the fitness...
-                        children.append(crossover(genome, np.random.choice(genomes), 1,2))
+                        children.append(crossover(genome, np.random.choice(genomes),1,2))
                     else:
-                        children.append(crossover(genome, np.random.choice(specy),2,1))
+                        children.append(crossover(genome, np.random.choice(specy),1,2))
 
 
 

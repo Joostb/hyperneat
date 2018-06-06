@@ -14,6 +14,7 @@ def crossover(parent_1, parent_2, fitness_1, fitness_2):
         parent_1 = fit_parent
 
     child_genes = cross_genes(parent_1, parent_2)
+        
 
     # how do we know the nodes?
     child_nodes = generate_nodes(child_genes, parent_1, parent_2)
@@ -35,25 +36,34 @@ def generate_nodes(genes, parent_1, parent_2):
     :return:
     """
     nodes = []
+    nb_nodes_sensor_output = parent_1.nb_output+parent_1.nb_sensor
+    
     index_node = []
     for gene in genes:         
         if gene.in_node not in index_node:
             index_node.append(gene.in_node)
         if gene.out not in index_node:
             index_node.append(gene.out)
-            
-    nb_nodes = len(index_node)
+        
+    index_node.sort()
     
-    for i in range(nb_nodes):
+    for i in range(nb_nodes_sensor_output):
         if i < parent_1.nb_sensor:
             nodes.append((i, 'sensor'))
-        elif i <= parent_1.nb_output+parent_1.nb_sensor:
+        elif i <= nb_nodes_sensor_output:
             nodes.append((i, 'output'))
         else :
-             nodes.append((i, 'hidden'))
-            
-    return nodes 
-        
+             pass
+         
+    max_nodes = max(index_node)
+    
+    if max_nodes >= nb_nodes_sensor_output:
+        for i in index_node:
+            if i >= nb_nodes_sensor_output:
+                nodes.append((i, 'hidden'))
+    
+    
+    return nodes         
 
 
 def cross_genes(parent_1: Genome, parent_2: Genome):
@@ -85,6 +95,8 @@ def cross_genes(parent_1: Genome, parent_2: Genome):
             # in this case they are the same and the gene is taken with some probability
             if np.random.rand() > matching_genes_prob:
                 new_gene_list.append(deepcopy(parent_1.genes[p_1]))
+            else:
+                new_gene_list.append(deepcopy(parent_2.genes[p_2]))
             p_1 += 1
             p_2 += 1
         elif parent_1.genes[p_1].innov > parent_2.genes[p_2].innov:
@@ -123,9 +135,7 @@ def delta(parent_1, parent_2):
             # there are no more overlapping parts
             # so we are done!
             excess += len(parent_1.genes) - p_1
-
             break
-
 
         elif parent_1.genes[p_1].innov == parent_2.genes[p_2].innov:
             matching += 1
@@ -152,20 +162,9 @@ def delta(parent_1, parent_2):
             else:
                 disjoint += 1
                 p_1 += 1
+                
     N = max(len(parent_1.genes), len(parent_2.genes))
 
-    print('matching')
-    if matching == 0:
-
-        # todo: matching is sometimes 0, this should not happen
-        # todo: figure out where the mistake is
-        plot_genome(parent_1)
-        plot_genome(parent_2)
-        [print(g) for g in (parent_1.genes)]
-
-        print('---------')
-        [print(g) for g in (parent_2.genes)]
-    print(matching)
     return excess / N, disjoint /N, weight_difference / matching
 
 def distance(parent_1, parent_2, c_1=1.0, c_2=1.0, c_3=0.4):
