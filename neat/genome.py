@@ -2,16 +2,24 @@ import numpy as np
 from neat.gene import Gene
 from copy import deepcopy
 
+sigmoid = lambda x: 1 / (1 + np.exp(-4.9 * x))
+relu = lambda x: np.max([0, x])
 
 class Genome:
     def __init__(self):
-        # eg : self.nodes = 'sensor' 'sensor' 'output'
+        # eg : self.nodes = 'sensor' 'hidden' 'output'
         self.nodes = []
 
         # list of Genes
         self.genes = []
 
+        self.input_neurons = []
+        self.hidden_neurons = []
+        self.output_neurons = []
+
         self.innovation_number = 0
+        self.neuron_activations = None
+        self.neuron_weights = None
 
     def initialize(self, n_in, n_out):
         
@@ -25,13 +33,19 @@ class Genome:
         for i in range(n_in, n_in+n_out):
             self.nodes += [(i, 'output')] 
 
-        for i, sensor in enumerate(self.nodes):
-            if sensor[1] == 'sensor':
+        for i, node in enumerate(self.nodes):
+            if node[1] == 'sensor':
+                self.input_neurons.append(i)
                 for j, output in enumerate(self.nodes):
                     if output[1] == 'output':
                         weight = np.random.rand()
 
                         self.genes.append(Gene(i, j, weight, True, self.innovation()))
+            elif node[1] is 'output':
+                self.output_neurons.append(i)
+
+
+        self.neuron_activations = np.zeros(shape=(len(self.nodes), ))
 
     def innovation(self):
         self.innovation_number += 1
@@ -75,28 +89,45 @@ class Genome:
             else:
                 gene.weight = np.random.normal()
 
+    def evaluate_input(self, inputs, n_iter=1):
+        new_activations = np.copy(self.neuron_activations)
+        new_activations[:len(inputs)] = inputs
 
-    def evaluate_input(self, inputs):
+        # We do this loop multiple time for convergence reasons (recurrent connections should be computed)
+        for i in range(n_iter):
+            new_activations = self.step_network_evaluation(self.input_neurons, new_activations)
+            new_activations = self.step_network_evaluation(self.hidden_neurons, new_activations)
 
-        network_old = np.zeros(len(self.nodes))
-        for i, value in enumerate(inputs):
-            network_old[i] = value
+        self.neuron_activations = new_activations
 
-        for i in range(10):
-            # calculate the input values for all network nodes
-            network_new = self.step_network_evaluation(network_old)
+        # for i, value in enumerate(inputs):
+        #     network_old[i] = value
+        #
+        # for i in range(10):
+        #     # calculate the input values for all network nodes
+        #     network_new = self.step_network_evaluation(network_old)
+        #
+        #     # calculate the activations for all network nodes
+        #     network_new = 1 / (1 + np.exp(-4.9 * network_new))
+        #
+        #     network_old = deepcopy(network_new)
 
-            # calculate the activations for all network nodes
-            network_new = 1 / (1 + np.exp(-4.9 * network_new))
+        output_layer = new_activations[self.output_neurons]
 
-            network_old = deepcopy(network_new)
+        return output_layer
 
-        return network_new
+    def step_network_evaluation(self, neurons, activations, activation_function=relu):
+        for neuron in neurons:
+            gene = self.genes[neuron]
+            activations[gene.out] += activations[gene.in_node] * gene.weight * gene.enabled
 
-    def step_network_evaluation(self, network_old):
-        network_new = np.zeros(len(network_old))
+        for out_neuron in set([self.genes[neuron].out for neuron in neurons]):
+            activations[out_neuron] = relu(activations[out_neuron])
 
-        for gene in self.genes:
-            network_new[gene.out] += network_old[gene.in_node] * gene.weight * gene.enabled
-
-        return network_new
+        return activations
+        # network_new = np.zeros(len(network_old))
+        #
+        # for gene in self.genes:
+        #     network_new[gene.out] += network_old[gene.in_node] * gene.weight * gene.enabled
+        #
+        # return network_new
