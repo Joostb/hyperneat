@@ -40,10 +40,13 @@ class FlappyGame:
         """
         reward = self.game.act(action)
         self.rewards.append(reward)
-        state = self.game.getScreenRGB() if self.return_rgb else self.game.getGameState()
+        state = self.get_state()
         done = self.game.game_over()
 
         return reward, state, done
+
+    def get_state(self):
+        return self.game.getScreenRGB() if self.return_rgb else self.game.getGameState()
 
     def reset(self):
         self.game.reset_game()
