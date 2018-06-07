@@ -25,6 +25,17 @@ def crossover(parent_1, parent_2, fitness_1, fitness_2):
     child_genome.nb_sensor = parent_1.nb_sensor
     child_genome.nb_output = parent_1.nb_output
 
+    for i, node in enumerate(child_nodes):
+        if node[1] == 'sensor':
+            child_genome.input_neurons.append(i)
+
+        elif node[1] is 'output':
+            child_genome.output_neurons.append(i)
+        elif node[1] is 'hidden':
+            child_genome.hidden_neurons.append(i)
+
+    child_genome.neuron_activations = np.zeros(shape=(len(child_genome.nodes),))
+
     return child_genome
 
 
