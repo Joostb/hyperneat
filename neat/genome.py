@@ -22,6 +22,13 @@ class Genome:
         self.neuron_activations = None
         self.neuron_weights = None
 
+        self.fitness_number = 0
+
+    def fitness(self):
+        # todo
+        self.fitness_number = np.random.rand()
+        return self.fitness_number
+
     def initialize(self, n_in, n_out):
         
         self.nb_sensor = n_in
