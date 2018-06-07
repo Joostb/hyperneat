@@ -69,12 +69,12 @@ def evolve_flappy():
     for i, values in enumerate(epoch_values):
         plt.plot(values[:, 0], label="e{}_up".format(i))
         plt.plot(values[:, 1], label="e{}_noop".format(i))
-    plt.title("Action Values over one epoch for one specie")
+    plt.title("Activations over one epoch for one specie")
     plt.legend()
     plt.show()
 
 
 if __name__ == "__main__":
-    population_size = 1
-    n_epochs = 10
+    population_size = 100
+    n_epochs = 100
     evolve_flappy()
