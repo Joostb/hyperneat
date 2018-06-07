@@ -1,3 +1,5 @@
+from tqdm import tqdm
+
 from ple.games.flappybird import FlappyBird
 from ple import PLE
 
@@ -46,15 +48,70 @@ class FlappyGame:
         return reward, state, done
 
     def get_state(self):
-        return self.game.getScreenRGB() if self.return_rgb else self.game.getGameState()
+        if self.return_rgb:
+            return self.game.getScreenRGB()
+        else:
+            return list(self.game.getGameState().values())
 
     def reset(self):
         self.game.reset_game()
+        # Do random action to initialize the new state
+        self.game.act(np.random.choice(self.valid_actions, 1))
+        return self.get_state()
+
+
+def normalize_state(state):
+    return (state - state_min) / state_norm
+
+
+state_min = np.array([-14., -13., 1., 25., 125., 145., 25., 125.])
+state_norm = \
+    np.array([399., 10., 289., 192., 292., 433., 192., 292.]) - np.array([-14., -13.,  1., 25., 125., 145., 25., 125.])
+
+
+def normalization_coefficients():
+    flappyGame = FlappyGame(return_rgb=False, display_screen=False)
+    n_test_frames = 100000
+    initial_state = list(flappyGame.get_state().values())
+
+    states = np.zeros(shape=(n_test_frames, len(initial_state)))
+
+    for i in tqdm(range(n_test_frames)):
+        random_action = np.random.choice(flappyGame.valid_actions, 1)
+        _, state, done = flappyGame.do_action(random_action)
+        states[i, :] = state
+        if done:
+            flappyGame.reset()
+
+    #          player_y
+    # 	       |     player_vel
+    #          |     |     next_pipe_dist_to_player
+    # 	       |     |     |     next_pipe_top_y
+    # 	       |     |     |     |     next_pipe_bottom_y
+    # 	       |     |     |     |     |      next_next_pipe_dist_to_player
+    # 	       |     |     |     |     |      |    next_next_pipe_top_y
+    # 	       |     |     |     |     |      |    |     next_next_pipe_bottom_y
+    #          |     |     |     |     |      |    |     |
+    # large: [399.,  10., 289., 192., 292., 433., 192., 292.]
+    #        [399.,  10., 289., 192., 292., 433., 192., 292.]
+    max_states = np.max(states, axis=0)
+    print("Max States:", max_states)
+    #          |     |     |     |     |      |    |     |
+    # large: [-14., -13.,  1.,  25. , 125., 145.,  25., 125.]
+    #        [-12., -13.,  1.,  26. , 126., 145.,  27., 127.]
+    min_states = np.min(states, axis=0)
+    print(min_states)
+
+    # [167.,  -4., 169., 103., 203., 313., 127., 227.]
+    median_states = np.median(states, axis=0)
+    print("Median States:", median_states)
+
+    return max_states, min_states, median_states
 
 
 def _test():
     flappyGame = FlappyGame(return_rgb=False)
-    n_test_frames = 1000
+    n_test_frames = 10000000000
     for _ in range(n_test_frames):
         random_action = np.random.choice(flappyGame.valid_actions, 1)
         reward, state, done = flappyGame.do_action(random_action)
@@ -66,4 +123,5 @@ def _test():
 
 
 if __name__ == "__main__":
-    _test()
+    # _test()
+    normalization_coefficients()
