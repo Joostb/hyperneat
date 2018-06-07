@@ -5,6 +5,7 @@ from copy import deepcopy
 sigmoid = lambda x: 1 / (1 + np.exp(-4.9 * x))
 relu = lambda x: np.max([0, x])
 
+
 class Genome:
     def __init__(self):
         # eg : self.nodes = 'sensor' 'hidden' 'output'
@@ -51,7 +52,6 @@ class Genome:
             elif node[1] is 'output':
                 self.output_neurons.append(i)
 
-
         self.neuron_activations = np.zeros(shape=(len(self.nodes), ))
 
     def innovation(self):
@@ -96,45 +96,26 @@ class Genome:
             else:
                 gene.weight = np.random.normal()
 
-    def evaluate_input(self, inputs, n_iter=1):
-        new_activations = np.copy(self.neuron_activations)
+    def evaluate_input(self, inputs):
+        new_activations = self.neuron_activations  # By reference, no need to set it again
         new_activations[:len(inputs)] = inputs
 
-        # We do this loop multiple time for convergence reasons (recurrent connections should be computed)
-        for i in range(n_iter):
-            new_activations = self.step_network_evaluation(self.input_neurons, new_activations)
-            new_activations = self.step_network_evaluation(self.hidden_neurons, new_activations)
-
-        self.neuron_activations = new_activations
-
-        # for i, value in enumerate(inputs):
-        #     network_old[i] = value
-        #
-        # for i in range(10):
-        #     # calculate the input values for all network nodes
-        #     network_new = self.step_network_evaluation(network_old)
-        #
-        #     # calculate the activations for all network nodes
-        #     network_new = 1 / (1 + np.exp(-4.9 * network_new))
-        #
-        #     network_old = deepcopy(network_new)
+        new_activations = self.step_network_evaluation(self.input_neurons, new_activations)
+        new_activations = self.step_network_evaluation(self.hidden_neurons, new_activations)
 
         output_layer = new_activations[self.output_neurons]
 
         return output_layer
 
-    def step_network_evaluation(self, neurons, activations, activation_function=relu):
+    def step_network_evaluation(self, neurons, activations, activation_function=sigmoid):
         for neuron in neurons:
             gene = self.genes[neuron]
             activations[gene.out] += activations[gene.in_node] * gene.weight * gene.enabled
 
         for out_neuron in set([self.genes[neuron].out for neuron in neurons]):
-            activations[out_neuron] = relu(activations[out_neuron])
+            activations[out_neuron] = activation_function(activations[out_neuron])
 
         return activations
-        # network_new = np.zeros(len(network_old))
-        #
-        # for gene in self.genes:
-        #     network_new[gene.out] += network_old[gene.in_node] * gene.weight * gene.enabled
-        #
-        # return network_new
+
+    def reset_activations(self):
+        self.neuron_activations = np.zeros(shape=(len(self.nodes), ))
