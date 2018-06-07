@@ -32,6 +32,7 @@ def evolve():
                 species.append([genome])
 
         genome_fitness = [fitness(g) for g in genomes]
+               
 
 
         for specy in species:
@@ -58,7 +59,7 @@ def evolve():
                     else:
                         children.append(crossover(genome, np.random.choice(specy),1,2))
 
-
+        
 
 
         genomes += children
@@ -67,9 +68,14 @@ def evolve():
 
 
 
-
 def fitness(genome):
-    return 3
+    pass 
+
+def fitness_sharing(specy, genome, threshold):
+    
+    sharing_function = len(specy)     
+    
+    return fitness(genome) / sharing_function
 
 
 if __name__ == '__main__':
