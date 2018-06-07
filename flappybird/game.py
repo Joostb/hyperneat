@@ -4,6 +4,7 @@ from ple.games.flappybird import FlappyBird
 from ple import PLE
 
 import numpy as np
+import warnings
 
 
 class FlappyGame:
@@ -24,15 +25,16 @@ class FlappyGame:
         # Now do one random action, such that the environment gets initialized properly
         self.game.act(np.random.choice(self.valid_actions, 1))
 
-        # Print Information About the Game
-        print("FlappyBird Initialized!")
-        print("\tValid Actions:", self.valid_actions)
-        if self.return_rgb:
-            print("\tReturning RBG numpy arrays of shape:", self.game.getScreenRGB().shape)
-        else:
-            print("\tReturning a dictionary with the features:")
-            for key in self.game.getGameState().keys():
-                print("\t\t", key)
+        if display_screen:  # verbose
+            # Print Information About the Game
+            print("FlappyBird Initialized!")
+            print("\tValid Actions:", self.valid_actions)
+            if self.return_rgb:
+                print("\tReturning RBG numpy arrays of shape:", self.game.getScreenRGB().shape)
+            else:
+                print("\tReturning a dictionary with the features:")
+                for key in self.game.getGameState().keys():
+                    print("\t\t", key)
 
     def do_action(self, action):
         """
