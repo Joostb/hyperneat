@@ -30,16 +30,16 @@ class Genome:
         return self.fitness_number
 
     def initialize(self, n_in, n_out):
-        
+
         self.nb_sensor = n_in
         self.nb_output = n_out
-        
-        self.nodes = []        
+
+        self.nodes = []
         for i in range(n_in):
             self.nodes += [(i, 'sensor')]
-            
-        for i in range(n_in, n_in+n_out):
-            self.nodes += [(i, 'output')] 
+
+        for i in range(n_in, n_in + n_out):
+            self.nodes += [(i, 'output')]
 
         for i, node in enumerate(self.nodes):
             if node[1] == 'sensor':
@@ -52,7 +52,7 @@ class Genome:
             elif node[1] is 'output':
                 self.output_neurons.append(i)
 
-        self.neuron_activations = np.zeros(shape=(len(self.nodes), ))
+        self.neuron_activations = np.zeros(shape=(len(self.nodes),))
 
     def innovation(self):
         self.innovation_number += 1
@@ -80,7 +80,7 @@ class Genome:
         node = (len(self.nodes), 'hidden')
 
         self.nodes.append(node)
-        
+
         new_gene_in = Gene(connection.in_node, node[0], 1, True, innovation_number)
         new_gene_out = Gene(node[0], connection.out, connection.weight, True, innovation_number + 1)
 
@@ -91,10 +91,11 @@ class Genome:
 
     def mutate_weights(self):
         for gene in self.genes:
-            if np.random.rand() <0.9:
-                gene.weight += np.random.normal(scale=0.01)
+            random_update = 2 * np.random.random() - 1
+            if np.random.rand() < 0.9:
+                gene.weight += random_update * 0.01
             else:
-                gene.weight = np.random.normal()
+                gene.weight = random_update
 
     def evaluate_input(self, inputs):
         new_activations = self.neuron_activations  # By reference, no need to set it again
@@ -107,7 +108,7 @@ class Genome:
 
         return output_layer
 
-    def step_network_evaluation(self, neurons, activations, activation_function=sigmoid):
+    def step_network_evaluation(self, neurons, activations, activation_function=relu):
         for neuron in neurons:
             gene = self.genes[neuron]
             activations[gene.out] += activations[gene.in_node] * gene.weight * gene.enabled
@@ -118,4 +119,4 @@ class Genome:
         return activations
 
     def reset_activations(self):
-        self.neuron_activations = np.zeros(shape=(len(self.nodes), ))
+        self.neuron_activations = np.zeros(shape=(len(self.nodes),))

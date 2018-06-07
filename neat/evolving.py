@@ -1,5 +1,3 @@
-
-
 import numpy as np
 
 from neat.genome import Genome
@@ -7,7 +5,8 @@ from visualization.visualization import plot_genome
 from neat.algorithm import distance, crossover
 from tqdm import tqdm
 
-def evolve(genomes, representatives,  innovation_number, delta_t=3.0):
+
+def evolve(genomes, representatives, innovation_number, delta_t=3.0):
     # input = 10
     # output = 5
     # genomes = [Genome() for _ in range(100)]
@@ -17,7 +16,6 @@ def evolve(genomes, representatives,  innovation_number, delta_t=3.0):
     #
     # delta_t = 2.0
     # innovation_number = 100
-
 
     # in parallel or something
 
@@ -69,7 +67,6 @@ def evolve(genomes, representatives,  innovation_number, delta_t=3.0):
 
     # genome_fitness = [fitness(g) for g in genomes]
 
-
     # mutation
     for specy in strong_species:
         for genome in specy:
@@ -98,11 +95,9 @@ def evolve(genomes, representatives,  innovation_number, delta_t=3.0):
     print('species')
     print(len(species))
 
-
     return genomes, representatives, innovation_number
 
     if len(species) > 1:
-
         print('>1 species')
 
     print('--------------')
@@ -116,21 +111,20 @@ def evolve(genomes, representatives,  innovation_number, delta_t=3.0):
     print(len(species))
 
 
-def eliminate_weakest(specy, percentage = 0.25):
+def eliminate_weakest(specy, percentage=0.25):
     sort = sorted(specy, key=lambda g: g.fitness_number)
 
-
     # eliminate weakest 25%
-    return sort[int(len(sort)*percentage):]
+    return sort[int(len(sort) * percentage):]
 
 
 def fitness(genome):
-    pass 
+    pass
+
 
 def fitness_sharing(specy, genome, threshold):
-    
-    sharing_function = len(specy)     
-    
+    sharing_function = len(specy)
+
     return fitness(genome) / sharing_function
 
 
