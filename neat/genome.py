@@ -108,7 +108,7 @@ class Genome:
 
         return output_layer
 
-    def step_network_evaluation(self, neurons, activations, activation_function=relu):
+    def step_network_evaluation(self, neurons, activations, activation_function=sigmoid):
         for neuron in neurons:
             gene = self.genes[neuron]
             activations[gene.out] += activations[gene.in_node] * gene.weight * gene.enabled

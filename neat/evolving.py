@@ -118,14 +118,14 @@ def eliminate_weakest(specy, percentage=0.25):
     return sort[int(len(sort) * percentage):]
 
 
-def fitness(genome):
-    pass
-
-
-def fitness_sharing(specy, genome, threshold):
-    sharing_function = len(specy)
-
-    return fitness(genome) / sharing_function
+# def fitness(genome):
+#     pass
+#
+#
+# def fitness_sharing(specy, genome, threshold):
+#     sharing_function = len(specy)
+#
+#     return fitness(genome) / sharing_function
 
 
 if __name__ == '__main__':
