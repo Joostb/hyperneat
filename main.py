@@ -1,5 +1,6 @@
 from flappybird.game import FlappyGame, normalize_state
 import numpy as np
+import matplotlib.pyplot as plt
 
 from neat.genome import Genome
 from neat.evolving import evolve
@@ -21,21 +22,23 @@ def evolve_flappy():
     for genome in population:
         genome.initialize(n_features, n_actions)
 
+    epoch_values = []
     for _ in range(n_epochs):
 
         best_fitness = -float('inf')
 
         # calculate fitness
         print('calculating fitness')
+        genome_values = []
         for i, genome in enumerate(population):
 
             # Play the game to get the fitness
             fitness = 0
-
             while True:
                 # Evaluate the current input and perform the best action
                 network_input = normalize_state(states[i])
                 action_values = genome.evaluate_input(network_input)
+                genome_values.append(action_values)
 
                 best_action = np.argmax(action_values)
                 best_action = gamePool[i].valid_actions[best_action]
@@ -55,16 +58,23 @@ def evolve_flappy():
 
             genome.fitness_number = fitness
 
+        epoch_values.append(np.array(genome_values))
+
         print('crossing and mutating genes')
         population, representatives, innovation_number = evolve(population, representatives, innovation_number)
 
-            # Evolve the genome
-            # TODO: implement this
         print('generation ', _)
         print("Best Epoch Fitness:", best_fitness)
 
+    for i, values in enumerate(epoch_values):
+        plt.plot(values[:, 0], label="e{}_up".format(i))
+        plt.plot(values[:, 1], label="e{}_noop".format(i))
+    plt.title("Action Values over one epoch for one specie")
+    plt.legend()
+    plt.show()
+
 
 if __name__ == "__main__":
-    population_size = 100
-    n_epochs = 100
+    population_size = 1
+    n_epochs = 10
     evolve_flappy()
