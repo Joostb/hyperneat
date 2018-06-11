@@ -44,21 +44,27 @@ def evolve_xor():
         # buffer for storing fitness per genome
         genome_fitnesses = []
         genome_activations = []
+
+
         for i, genome in enumerate(population):
 
             # Run XOR inputs
             fitness = 1
 
+            # rebuild the number of nodes etc
+            genome.reset_activations()
             genome_activation = []
 
             for X, y in zip(xor_input, xor_output):
                 # Evaluate the current input and perform the best action
-                output = genome.evaluate_input(X)
+                output = genome.evaluate_input(X, steps=2)
                 y_pred = np.argmax(output)
                 genome_activation.append(output[y_pred])
 
-                if y_pred is y:
+                if y_pred == y:
                     fitness += 1
+
+                genome.reset_activations()
 
             genome_fitnesses.append(fitness) # fitness
             genome_activations.append(np.array(genome_activation))
@@ -71,14 +77,16 @@ def evolve_xor():
         epoch_activations.append(np.array(genome_activations))
 
         print('crossing and mutating genes')
-        population, representatives, innovation_number = evolve(population, representatives, innovation_number)
+        population, representatives, innovation_number = evolve(population, representatives, innovation_number, disable_crossover=True)
 
         print('generation ', _)
         print("Best Epoch Fitness:", best_fitness)
 
     epoch_fitnesses = np.array(epoch_fitnesses)
+    print(epoch_fitnesses)
     for i in range(epoch_fitnesses.shape[1]):
         plt.plot(epoch_fitnesses[:, i] - 1, label="specie {}".format(i))
+
     plt.title("Fitness per epoch per specie")
     plt.xlabel("epoch")
     plt.ylabel("fitness")
@@ -98,5 +106,5 @@ def evolve_xor():
 
 if __name__ == "__main__":
     population_size = 5
-    n_epochs = 1000
+    n_epochs = 400
     evolve_xor()

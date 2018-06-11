@@ -97,23 +97,46 @@ class Genome:
             else:
                 gene.weight = random_update
 
-    def evaluate_input(self, inputs):
+    def evaluate_input(self, inputs, steps=2):
+
+
         new_activations = self.neuron_activations  # By reference, no need to set it again
         new_activations[:len(inputs)] = inputs
 
-        new_activations = self.step_network_evaluation(self.input_neurons, new_activations)
-        new_activations = self.step_network_evaluation(self.hidden_neurons, new_activations)
+        for i in range(steps):
+            new_activations = self.step_network_evaluation(self.input_neurons, new_activations)
+            # new_activations = self.step_network_evaluation(self.hidden_neurons, new_activations)
 
         output_layer = new_activations[self.output_neurons]
 
         return output_layer
 
-    def step_network_evaluation(self, neurons, activations, activation_function=sigmoid):
-        for neuron in neurons:
+    def step_network_evaluation(self, input_neurons, activations, activation_function=sigmoid):
+
+        # todo: debug this function
+        # here we want to calculate the new activations for all neurons, based on the old activations.
+
+        network_new = np.zeros(shape=activations.shape)
+        # print(network_new.shape)
+        # [print(g) for g in self.genes]
+        # print(self.nodes)
+
+
+        for gene in self.genes:
+            # print(gene.out)
+            network_new[gene.out] += activations[gene.in_node] * gene.weight * gene.enabled
+
+        # numpy can apply the function elementwise, without looping!
+        return activation_function(network_new)
+
+        ## WRONG ##
+        ## genes denote connections **between** neurons, not neurons themselves
+
+        for neuron in input_neurons:
             gene = self.genes[neuron]
             activations[gene.out] += activations[gene.in_node] * gene.weight * gene.enabled
 
-        for out_neuron in set([self.genes[neuron].out for neuron in neurons]):
+        for out_neuron in set([self.genes[neuron].out for neuron in input_neurons]):
             activations[out_neuron] = activation_function(activations[out_neuron])
 
         return activations

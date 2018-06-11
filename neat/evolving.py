@@ -6,7 +6,7 @@ from neat.algorithm import distance, crossover
 from tqdm import tqdm
 
 
-def evolve(genomes, representatives, innovation_number, delta_t=3.0):
+def evolve(genomes, representatives, innovation_number, delta_t=3.0, disable_crossover = False):
     # input = 10
     # output = 5
     # genomes = [Genome() for _ in range(100)]
@@ -44,6 +44,9 @@ def evolve(genomes, representatives, innovation_number, delta_t=3.0):
 
     # crossover
     for specy in species:
+        if disable_crossover:
+            strong_species = species
+            continue
         specy_fitness = sum([g.fitness_number for g in specy]) / total_fitness
         allowed_offspring = int(len(genomes) * specy_fitness)
 
@@ -91,6 +94,8 @@ def evolve(genomes, representatives, innovation_number, delta_t=3.0):
 
     print('genomes')
     print(len(genomes))
+
+    print('average size', sum([len(g.genes) for g in genomes]) / len(genomes))
 
     print('species')
     print(len(species))
