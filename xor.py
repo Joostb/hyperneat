@@ -68,14 +68,14 @@ def evolve_xor():
 
             for X, y in zip(xor_input, xor_output):
                 # Evaluate the current input and perform the best action
-                output = genome.evaluate_input(X, steps=1)[0]
+                output = genome.evaluate_input(X, steps=2)[0]
                 genome_activation.append(output)
 
-                mean_squared = True
+                mean_squared = False
                 if mean_squared:
                     # this fitness still crashes
-                    # fitness += 1 - (y - output)*(y - output)
-                    fitness += 1 - abs((y - output))
+                    fitness += 1 - (y - output)*(y - output)
+                    # fitness += 1 - abs((y - output))
 
                 else:
                     y_pred = output > 0.5
@@ -99,7 +99,7 @@ def evolve_xor():
             population,
             representatives,
             innovation_number,
-            delta_t=2.0
+            delta_t=1.5
         )
 
         print(len(population))
@@ -148,5 +148,5 @@ def evolve_xor():
 
 if __name__ == "__main__":
     population_size = 100
-    n_epochs = 140
+    n_epochs = 100
     best_genome = evolve_xor()

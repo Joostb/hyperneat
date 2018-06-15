@@ -33,26 +33,11 @@ def evolve(genomes, representatives, innovation_number, delta_t=3.0):
     species = list(filter(lambda sp: sp != [], species))
 
     strong_species = []
-    total_allowed = 0
-    remaining = len(genomes)
-    remaining_fitness = total_fitness
+    allowed_offsprings = new_species_size(species, pop_size, total_fitness)
 
     # crossover
     for idx, specy in enumerate(species):
-        specy_sum_fitness = sum([g.fitness_number for g in specy])
-        if remaining_fitness == 0:
-            continue
-        specy_fitness =  specy_sum_fitness / remaining_fitness
-        allowed_offspring = int(remaining * specy_fitness)
-
-        remaining -=  allowed_offspring
-        remaining_fitness -= specy_sum_fitness
-
-
-        total_allowed += allowed_offspring
-
-
-
+        allowed_offspring = allowed_offsprings[idx]
         strong = eliminate_weakest(specy)
 
         # cull more weak members
@@ -128,6 +113,29 @@ def evolve(genomes, representatives, innovation_number, delta_t=3.0):
     print(len(genomes[90].genes))
     print('species')
     print(len(species))
+
+
+def new_species_size(species, total, total_fitness):
+
+    allowed_offsprings = []
+
+    for idx, specy in enumerate(species):
+        specy_fitness = sum([g.fitness_number for g in specy]) / total_fitness
+        allowed_offspring_old = int(total * specy_fitness)
+        allowed_offsprings.append(allowed_offspring_old)
+
+    while sum(allowed_offsprings) != total:
+        if sum(allowed_offsprings) < total:
+            allowed_offsprings[0] += 1
+        else:
+            allowed_offsprings[0] -= 1
+
+
+
+    if sum(allowed_offsprings) != total:
+        print('error')
+
+    return allowed_offsprings
 
 
 def eliminate_weakest(specy, percentage=0.25):
