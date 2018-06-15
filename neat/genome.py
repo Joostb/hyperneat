@@ -46,7 +46,7 @@ class Genome:
                 self.input_neurons.append(i)
                 for j, output in enumerate(self.nodes):
                     if output[1] == 'output':
-                        weight = np.random.rand()
+                        weight = np.random.normal()
 
                         self.genes.append(Gene(i, j, weight, True, self.innovation()))
             elif node[1] is 'output':
@@ -69,7 +69,7 @@ class Genome:
 
             for gene in self.genes:
                 if gene.in_node != index and in_node[1] != 'sensor':  # can there be loops 4 -> 4
-                    new_gene = Gene(int(index), out_node, np.random.rand(), True, innovation_number)
+                    new_gene = Gene(int(index), out_node, np.random.normal(), True, innovation_number)
                     self.genes.append(new_gene)
                     return new_gene
 
@@ -90,8 +90,12 @@ class Genome:
         return new_gene_in, new_gene_out
 
     def mutate_weights(self):
+
+
         for gene in self.genes:
-            random_update = 2 * np.random.random() - 1
+            # we want the updates to be gaussian noise, not uniform
+            # since big changes radically change the 'meanng
+            random_update = np.random.normal()
             if np.random.rand() < 0.9:
                 gene.weight += random_update * 0.01
             else:
@@ -101,7 +105,8 @@ class Genome:
 
 
         new_activations = self.neuron_activations  # By reference, no need to set it again
-        new_activations[:len(inputs)] = inputs
+        # new_activations[:len(inputs)] = inputs
+        new_activations[:len(inputs)] += inputs
 
         for i in range(steps):
             new_activations = self.step_network_evaluation(self.input_neurons, new_activations)
