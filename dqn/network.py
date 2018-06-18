@@ -20,7 +20,7 @@ def deep_q_network(input_shape, n_actions=2):
     return model
 
 
-def feature_q_network(input_shape=(4, 8), n_actions=2):
+def feature_q_network_conv(input_shape=(4, 8), n_actions=2):
     input = L.Input(shape=input_shape)
 
     x = L.Conv1D(32, kernel_size=2, padding="valid", activation="relu")(input)
@@ -39,6 +39,22 @@ def feature_q_network(input_shape=(4, 8), n_actions=2):
     return model
 
 
+def feature_q_network_dense(input_shape=(8,), n_actions=2):
+    input = L.Input(shape=input_shape)
+
+    x = L.Dense(32, activation="relu")(input)
+    x = L.Dense(64, activation="relu")(x)
+    x = L.Dense(32, activation="linear")(x)
+
+    output = L.Dense(n_actions)(x)
+
+    model = Model(inputs=[input], outputs=[output])
+    model.summary()
+
+    return model
+
+
 if __name__ == "__main__":
     deep_q_network((4, 84, 84), n_actions=2)
-    feature_q_network((4, 8), n_actions=2)
+    feature_q_network_conv((4, 8), n_actions=2)
+    feature_q_network_dense()
