@@ -4,6 +4,44 @@ from dqn.agent import DDQNAgent
 from dqn.network import feature_q_network_dense
 from flappybird.game import FlappyGame, normalize_state
 
+import argparse
+
+
+def play_flappy():
+    game = FlappyGame(return_rgb=False, display_screen=True, frame_skip=2)
+    s_t = np.array(normalize_state(game.get_state()))
+
+    n_features = len(s_t)
+    # This is actually 2 things, doing nothing or flying up. Depending on our implementation we could change it to 1?
+    n_actions = len(game.valid_actions)
+
+    agent = DDQNAgent((n_features,), n_actions, feature_q_network_dense, start_epsilon=0.)
+    agent.load("flappy_dqn.h5")
+    agent.update_target_model()
+
+    rewards = []
+
+    for t in range(N_GAMES):
+        s_t = normalize_state(game.reset())
+        s_t = np.expand_dims(s_t, axis=0)
+        total_reward = 0
+        done = False
+
+        while not done:
+            action_index = agent.act(s_t)
+            reward, s_t, done = game.do_action(game.valid_actions[action_index])
+
+            total_reward += reward
+
+            s_t = np.expand_dims(normalize_state(s_t), axis=0)
+            if done:
+                rewards.append(total_reward)
+                print(
+                    "Game: {:05d} \t Score: {:+03d} \t Avg Score: {:+04f} \t High Score: {:+04d}".format(
+                        t, total_reward, np.mean(rewards), np.max(reward))
+                )
+                log_file.write("{}, {}".format(t, total_reward))
+
 
 def train_flappy_features():
     game = FlappyGame(return_rgb=False, display_screen=False, frame_skip=2, reward_clipping=True)
@@ -55,11 +93,24 @@ def train_flappy_features():
 
 
 if __name__ == "__main__":
-    log_file = open("log.csv", "w")
-    log_file.write("game, score, epsilon, loss\n")
-    N_GAMES = 50000
-    WARM_UP = 1000
-    BATCH_SIZE = 32
+    parser = argparse.ArgumentParser(description="DDQN Flappy Bird")
+    parser.add_argument("--train", dest="train", action="store_true", default=True)
+    parser.add_argument("--n-games", dest="n_games", nargs="?", default=500, type=int)
+    args = parser.parse_args()
 
-    train_flappy_features()
-    log_file.close()
+    N_GAMES = args.n_games
+
+    if args.train:
+        log_file = open("log.csv", "w")
+        log_file.write("game, score, epsilon, loss\n")
+
+        WARM_UP = 1000
+        BATCH_SIZE = 32
+
+        train_flappy_features()
+        log_file.close()
+    else:
+        log_file = open("run.csv", "w")
+        log_file.write("game, score\n")
+        play_flappy()
+        log_file.close()
