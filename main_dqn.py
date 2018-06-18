@@ -3,13 +3,13 @@ from collections import deque
 
 import numpy as np
 from keras import optimizers
+import keras
 
-from dqn.network import feature_q_network
+from dqn.network import feature_q_network_conv
 from flappybird.game import FlappyGame, normalize_state
 
-
 def train_flappy_features():
-    game = FlappyGame(return_rgb=False, display_screen=False, frame_skip=FRAMES_PER_ACTION, reward_clipping=True)
+    game = FlappyGame(return_rgb=True, display_screen=False, frame_skip=FRAMES_PER_ACTION, reward_clipping=True)
     state = np.array(normalize_state(game.get_state()))
 
     n_features = len(state)
@@ -19,8 +19,9 @@ def train_flappy_features():
     epsilon = INITIAL_EPSILON
     replay_memory = deque()
 
-    model = feature_q_network((CHANNELS, n_features), n_actions=n_actions)
-    model.compile(optimizer=optimizers.Adam(lr=LEARNING_RATE), loss="MSE")
+    model = keras.models.load_model("dqn.h5")
+    # model = feature_q_network_conv((CHANNELS, n_features), n_actions=n_actions)
+    # model.compile(optimizer=optimizers.Nadam(lr=LEARNING_RATE), loss="MSE")
 
     s_t = np.stack((state, state, state, state), axis=0)
     s_t = np.expand_dims(s_t, axis=0)
@@ -92,15 +93,15 @@ def train_flappy_features():
 
 
 if __name__ == "__main__":
-    GAMMA = 0.99
+    GAMMA = 0.9
     WARM_UP = 3200
     FINAL_EPSILON = 0.0001
-    INITIAL_EPSILON = 0.2
-    DECAY_EPSILON = 250000.
+    INITIAL_EPSILON = 0.125
+    DECAY_EPSILON = 125000.
     REPLAY_MEMORY = 50000
     BATCH_SIZE = 64
     FRAMES_PER_ACTION = 1
-    LEARNING_RATE = 1e-3
+    LEARNING_RATE = 1e-6
     CHANNELS = 4
 
     train_flappy_features()
