@@ -80,6 +80,7 @@ class Genome:
         node = (len(self.nodes), 'hidden')
 
         self.nodes.append(node)
+        self.neuron_activations = np.append(self.neuron_activations, 0)
 
         new_gene_in = Gene(connection.in_node, node[0], 1, True, innovation_number)
         new_gene_out = Gene(node[0], connection.out, connection.weight, True, innovation_number + 1)
@@ -120,15 +121,16 @@ class Genome:
 
         # todo: debug this function
         # here we want to calculate the new activations for all neurons, based on the old activations.
-
+        
+#        print(input_neurons)
+#        print(activations)
         network_new = np.zeros(shape=activations.shape)
-        # print(network_new.shape)
-        # [print(g) for g in self.genes]
-        # print(self.nodes)
-
-
+#        print(network_new.shape)
+#        [print(g) for g in self.genes]
+#        print(self.nodes)
+        
         for gene in self.genes:
-            # print(gene.out)
+            #print(gene.out)
             network_new[gene.out] += activations[gene.in_node] * gene.weight * gene.enabled
 
         # numpy can apply the function elementwise, without looping!
