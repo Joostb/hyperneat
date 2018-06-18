@@ -29,6 +29,7 @@ def train_flappy_features():
 
     best_game = -1
     reward_game = 0
+    last_100_games = []
 
     while True:
         loss = 0
@@ -77,7 +78,15 @@ def train_flappy_features():
             model.save("dqn.h5", overwrite=True)
         if done:
             best_game = reward_game if reward_game > best_game else best_game
-            print("Epoch: {:05d}, Score: {:+04d}, High Score: {:+04d}, Loss: {:05f}, Epsilon: {:04f}".format(t, reward_game, best_game, loss, epsilon))
+            last_100_games.append(reward_game)
+            if len(last_100_games) > 100:
+                del last_100_games[0]
+
+            print(
+                "Epoch: {:05d} \t Score: {:+04d} \t Avg@100: {:+04f} \t High Score: {:+04d} \t "
+                "Loss: {:05f} \t Epsilon: {:04f}".format(
+                    t, reward_game, np.mean(last_100_games), best_game, loss, epsilon)
+            )
             reward_game = 0
             game.reset()
 
@@ -85,9 +94,9 @@ def train_flappy_features():
 if __name__ == "__main__":
     GAMMA = 0.99
     WARM_UP = 3200
-    FINAL_EPSILON = 0.001
-    INITIAL_EPSILON = 0.1
-    DECAY_EPSILON = 25000.
+    FINAL_EPSILON = 0.0001
+    INITIAL_EPSILON = 0.2
+    DECAY_EPSILON = 250000.
     REPLAY_MEMORY = 50000
     BATCH_SIZE = 64
     FRAMES_PER_ACTION = 1
