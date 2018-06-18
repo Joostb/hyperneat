@@ -1,6 +1,9 @@
 # HyperNEAT
 A repo for the NC course
 
+# Report
+The report may be found [here](https://www.sharelatex.com/8872427238cwcqgxhkhzny)
+
 # Installation
 Required packages are numpy and pygame.
 
