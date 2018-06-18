@@ -9,7 +9,7 @@ import warnings
 
 class FlappyGame:
 
-    def __init__(self, return_rgb=False, display_screen=True, frame_skip=5):
+    def __init__(self, return_rgb=False, display_screen=True, frame_skip=5, reward_clipping=False):
         # Setup the environment
         self.game = PLE(FlappyBird(),
                         fps=30,
@@ -17,6 +17,7 @@ class FlappyGame:
                         frame_skip=frame_skip)
         self.valid_actions = self.game.getActionSet()
         self.return_rgb = return_rgb
+        self.reward_clipping = reward_clipping
 
         # Start the game and initialize values
         self.rewards = []
@@ -42,7 +43,12 @@ class FlappyGame:
         :param action:
         :return:
         """
-        reward = self.game.act(action)
+        if action not in self.valid_actions:
+            reward = self.game.act(self.valid_actions[action])
+        else:
+            reward = self.game.act(action)
+        if self.reward_clipping:
+            reward = 1 if reward > 0 else -1 if reward < 0 else 0
         self.rewards.append(reward)
         state = self.get_state()
         done = self.game.game_over()
