@@ -43,7 +43,7 @@ def play_flappy():
                 log_file.write("{}, {}".format(t, total_reward))
 
 
-def train_flappy_features():
+def train_flappy_features(begin_epoch=0, begin_epsilon=1.0):
     game = FlappyGame(return_rgb=False, display_screen=False, frame_skip=2, reward_clipping=True)
     s_t = np.array(normalize_state(game.get_state()))
 
@@ -51,12 +51,12 @@ def train_flappy_features():
     # This is actually 2 things, doing nothing or flying up. Depending on our implementation we could change it to 1?
     n_actions = len(game.valid_actions)
 
-    agent = DDQNAgent((n_features,), n_actions, feature_q_network_dense)
+    agent = DDQNAgent((n_features,), n_actions, feature_q_network_dense, start_epsilon=begin_epsilon)
 
     reward_100 = []
     best_game = -1
 
-    for t in range(N_GAMES):
+    for t in range(begin_epoch, N_GAMES+begin_epoch):
         s_t = normalize_state(game.reset())
         s_t = np.expand_dims(s_t, axis=0)
         total_reward = 0
@@ -95,19 +95,28 @@ def train_flappy_features():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="DDQN Flappy Bird")
     parser.add_argument("--train", dest="train", action="store_true", default=True)
+    parser.add_argument("--resume", dest="resume", action="store_true", default=False)
     parser.add_argument("--n-games", dest="n_games", nargs="?", default=500, type=int)
     args = parser.parse_args()
 
     N_GAMES = args.n_games
 
     if args.train:
-        log_file = open("log.csv", "w")
-        log_file.write("game, score, epsilon, loss\n")
+        if args.resume:
+            prev_log = np.genfromtxt("log.csv", dtype=float, delimiter=',', skip_header=True)
+            begin_epoch = prev_log[-1, 0]
+            begin_epsilon = prev_log[-1, 2]
+            log_file = open("log.csv", "a")
+        else:
+            log_file = open("log.csv", "w")
+            log_file.write("game, score, epsilon, loss\n")
+            begin_epoch = 0
+            begin_epsilon = 1.0
 
         WARM_UP = 1000
         BATCH_SIZE = 32
 
-        train_flappy_features()
+        train_flappy_features(begin_epoch=begin_epoch, begin_epsilon=begin_epsilon)
         log_file.close()
     else:
         log_file = open("run.csv", "w")
