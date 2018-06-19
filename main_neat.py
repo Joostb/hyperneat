@@ -6,7 +6,6 @@ from neat_algoritm.genome import Genome
 from neat_algoritm.evolving import evolve
 
 
-
 def evolve_flappy():
     gamePool = [FlappyGame(return_rgb=False, display_screen=False) for _ in range(population_size)]
     states = [game.get_state() for game in gamePool]
