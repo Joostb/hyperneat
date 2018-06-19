@@ -1,8 +1,8 @@
 import numpy as np
 
-from neat.genome import Genome
+from neat_algoritm.genome import Genome
 from visualization.visualization import plot_genome
-from neat.algorithm import distance, crossover
+from neat_algoritm.algorithm import distance, crossover
 from tqdm import tqdm
 
 

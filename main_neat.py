@@ -2,8 +2,9 @@ from flappybird.game import FlappyGame, normalize_state
 import numpy as np
 import matplotlib.pyplot as plt
 
-from neat.genome import Genome
-from neat.evolving import evolve
+from neat_algoritm.genome import Genome
+from neat_algoritm.evolving import evolve
+
 
 
 def evolve_flappy():

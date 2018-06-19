@@ -2,7 +2,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from neat.genome import Genome
+from neat_algoritm.genome import Genome
 from visualization.visualization import plot_genome
 
 
