@@ -140,8 +140,6 @@ def evolve_xor():
 
     gs = sorted(population, key=lambda g: g.fitness_number, )
 
-
-
     return gs
 
 

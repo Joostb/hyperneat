@@ -105,9 +105,15 @@ def cross_genes(parent_1: Genome, parent_2: Genome):
         if parent_1.genes[p_1].innov == parent_2.genes[p_2].innov:
             # in this case they are the same and the gene is taken with some probability
             if np.random.rand() > matching_genes_prob:
-                new_gene_list.append(deepcopy(parent_1.genes[p_1]))
+                gene_parent = deepcopy(parent_1.genes[p_1])
+                if parent_1.genes[p_1].enabled == False and np.random.rand() > 0.75:
+                    gene_parent.enabled = True
+                new_gene_list.append(gene_parent)
             else:
-                new_gene_list.append(deepcopy(parent_2.genes[p_2]))
+                gene_parent = deepcopy(parent_2.genes[p_2])
+                if parent_2.genes[p_2].enabled == False and np.random.rand() > 0.75:
+                    gene_parent.enabled = True
+                new_gene_list.append(gene_parent)
             p_1 += 1
             p_2 += 1
         elif parent_1.genes[p_1].innov > parent_2.genes[p_2].innov:
@@ -178,12 +184,10 @@ def delta(parent_1, parent_2):
 
     return excess / N, disjoint /N, weight_difference / matching
 
-def distance(parent_1, parent_2, c_1=1.0, c_2=1.0, c_3=0.4):
+def distance(parent_1, parent_2, c_1=1.0, c_2=1.0, c_3=3.0):
     E, D, W = delta(parent_1, parent_2)
 
     return c_1 * E + c_2 * D + c_3 * W
-
-
 
 
 if __name__ == "__main__":
