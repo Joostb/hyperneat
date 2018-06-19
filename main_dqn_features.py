@@ -8,7 +8,7 @@ import argparse
 
 
 def play_flappy():
-    game = FlappyGame(return_rgb=False, display_screen=True, frame_skip=2)
+    game = FlappyGame(return_rgb=False, display_screen=True, frame_skip=2, reward_clipping=True)
     s_t = np.array(normalize_state(game.get_state()))
 
     n_features = len(s_t)
@@ -37,8 +37,8 @@ def play_flappy():
             if done:
                 rewards.append(total_reward)
                 print(
-                    "Game: {:05d} \t Score: {:+03d} \t Avg Score: {:+04f} \t High Score: {:+04d}".format(
-                        t, total_reward, np.mean(rewards), np.max(reward))
+                    "Game: {:05d} \t Score: {:+03f} \t Avg Score: {:+04f} \t High Score: {:+04f}".format(
+                        t, total_reward, np.mean(rewards), np.max(rewards))
                 )
                 log_file.write("{}, {}".format(t, total_reward))
 
@@ -94,7 +94,7 @@ def train_flappy_features(begin_epoch=0, begin_epsilon=1.0):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="DDQN Flappy Bird")
-    parser.add_argument("--train", dest="train", action="store_true", default=True)
+    parser.add_argument("--train", dest="train", action="store_true", default=False)
     parser.add_argument("--resume", dest="resume", action="store_true", default=False)
     parser.add_argument("--n-games", dest="n_games", nargs="?", default=500, type=int)
     args = parser.parse_args()

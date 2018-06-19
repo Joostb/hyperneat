@@ -1,6 +1,8 @@
 import random
 from collections import deque
 
+from keras import models
+
 import keras.backend as K
 import numpy as np
 from keras import optimizers
@@ -91,7 +93,7 @@ class DDQNAgent:
             return 0
 
     def load(self, name):
-        self.model.load(name)
+        self.model = models.load_model(name, custom_objects={"_huber_loss": self._huber_loss})
 
     def save(self, name):
         self.model.save(name)
