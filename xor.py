@@ -1,9 +1,8 @@
-from flappybird.game import FlappyGame, normalize_state
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
-from neat.genome import Genome
-from neat.evolving import evolve
+from neat_algoritm.evolving import evolve
+from neat_algoritm.genome import Genome
 
 
 def evolve_xor():
@@ -28,14 +27,12 @@ def evolve_xor():
         0,
     ]
 
-
     # xor_output = [
     #     1,
     #     1,
     #     1,
     #     1,
     # ]
-
 
     population = [Genome() for _ in range(population_size)]
     for genome in population:
@@ -45,8 +42,8 @@ def evolve_xor():
 
     epoch_fitnesses = []
     epoch_activations = []
-    for _ in range(n_epochs):
 
+    for _ in range(n_epochs):
         best_fitness = 0
 
         # calculate fitness
@@ -56,9 +53,7 @@ def evolve_xor():
         genome_fitnesses = []
         genome_activations = []
 
-
         for i, genome in enumerate(population):
-
             # Run XOR inputs
             fitness = 1
 
@@ -74,7 +69,7 @@ def evolve_xor():
                 mean_squared = False
                 if mean_squared:
                     # this fitness still crashes
-                    fitness += 1 - (y - output)*(y - output)
+                    fitness += 1 - (y - output) * (y - output)
                     # fitness += 1 - abs((y - output))
 
                 else:
@@ -84,7 +79,7 @@ def evolve_xor():
 
                 genome.reset_activations()
 
-            genome_fitnesses.append(fitness) # fitness
+            genome_fitnesses.append(fitness)  # fitness
             genome_activations.append(np.array(genome_activation))
             if fitness > best_fitness:
                 best_fitness = fitness
@@ -119,7 +114,6 @@ def evolve_xor():
     plt.legend()
     # plt.show()
 
-
     plt.figure(2)
 
     epoch_activations = np.array(epoch_activations)
@@ -131,7 +125,6 @@ def evolve_xor():
             plt.plot(epoch_activations[:, specie, datapoint], label="specie{}_{}".format(specie, xor_input[datapoint]))
         # plt.plot(average_activation / 4, label="specie{}_".format(specie))
 
-
     plt.title("Activation per epoch per specie per XOR input")
     plt.xlabel("epoch")
     plt.ylabel("activation")
@@ -140,10 +133,7 @@ def evolve_xor():
 
     gs = sorted(population, key=lambda g: g.fitness_number, )
 
-
-
     return gs
-
 
 
 if __name__ == "__main__":

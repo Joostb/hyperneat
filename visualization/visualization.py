@@ -2,7 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 
-from neat.genome import Genome
+from neat_algoritm.genome import Genome
 
 
 def plot_genome(genome: Genome):

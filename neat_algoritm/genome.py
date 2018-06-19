@@ -1,5 +1,5 @@
 import numpy as np
-from neat.gene import Gene
+from neat_algoritm.gene import Gene
 from copy import deepcopy
 
 sigmoid = lambda x: 1 / (1 + np.exp(-4.9 * x))
