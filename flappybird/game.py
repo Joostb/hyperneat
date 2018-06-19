@@ -4,12 +4,12 @@ from ple.games.flappybird import FlappyBird
 from ple import PLE
 
 import numpy as np
-import warnings
 
 
 class FlappyGame:
 
-    def __init__(self, return_rgb=False, display_screen=True, frame_skip=5, reward_clipping=False):
+    def __init__(self, return_rgb=False, display_screen=True, frame_skip=5, reward_clipping=False,
+                 continuous_reward=False, leave_out_next_next=False, custom_reward=False):
         # Setup the environment
         self.game = PLE(FlappyBird(),
                         fps=30,
@@ -18,6 +18,9 @@ class FlappyGame:
         self.valid_actions = self.game.getActionSet()
         self.return_rgb = return_rgb
         self.reward_clipping = reward_clipping
+        self.continuous_reward = continuous_reward
+        self.leave_out_next_next = leave_out_next_next
+        self.custom_reward = custom_reward
 
         # Start the game and initialize values
         self.rewards = []
@@ -49,9 +52,20 @@ class FlappyGame:
             reward = self.game.act(action)
         if self.reward_clipping:
             reward = 1 if reward > 0 else -1 if reward < 0 else 0
+        elif self.continuous_reward:
+            reward = 1 if reward >= 0 else 0
         self.rewards.append(reward)
         state = self.get_state()
+
         done = self.game.game_over()
+
+        if self.custom_reward:
+            player_y = state[0]
+            pipe_top = state[3]
+            pipe_bottom = state[4]
+
+            reward = 200 - (player_y - (pipe_bottom + pipe_top)/2)
+            reward /= 100
 
         return reward, state, done
 
@@ -59,7 +73,10 @@ class FlappyGame:
         if self.return_rgb:
             return self.game.getScreenRGB()
         else:
-            return list(self.game.getGameState().values())
+            features = list(self.game.getGameState().values())
+            features = features[0:5]
+            return features
+
 
     def reset(self):
         self.game.reset_game()
@@ -69,7 +86,8 @@ class FlappyGame:
 
 
 def normalize_state(state):
-    return (state - state_min) / state_norm
+    # return (state - state_min) / state_norm
+    return (state - state_min[0:5]) / state_norm[0:5]
 
 
 state_min = np.array([-14., -13., 1., 25., 125., 145., 25., 125.])
@@ -131,5 +149,5 @@ def _test():
 
 
 if __name__ == "__main__":
-    # _test()
-    normalization_coefficients()
+    _test()
+    # normalization_coefficients()
