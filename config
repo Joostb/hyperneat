@@ -9,7 +9,7 @@ pop_size              = 100
 reset_on_extinction   = 0
 
 [DefaultGenome]
-num_inputs              = 4
+num_inputs              = 8
 num_hidden              = 1
 num_outputs             = 1
 initial_connection      = partial_direct 0.5
@@ -61,3 +61,4 @@ max_stagnation  = 20
 [DefaultReproduction]
 elitism            = 2
 survival_threshold = 0.2
+
