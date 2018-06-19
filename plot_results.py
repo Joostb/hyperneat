@@ -34,6 +34,25 @@ def plot_smoothed_results(data):
     plt.show()
 
 
+def plot_neat(data, label="fitness"):
+    best = []
+    median = []
+    mean = []
+    for generation in data:
+        best.append(np.max(generation))
+        median.append(np.median(generation))
+        mean.append(np.mean(generation))
+
+    plt.figure()
+    plt.plot(np.arange(1, len(best) + 1), best, label="max")
+    plt.plot(np.arange(1, len(best) + 1), median, label="median")
+    plt.plot(np.arange(1, len(best) + 1), mean, label="mean")
+    plt.xlabel("Generation")
+    plt.ylabel(label)
+    plt.legend()
+    plt.show()
+
+
 if __name__ == "__main__":
     data = np.genfromtxt("log.csv", dtype=float, delimiter=',', skip_header=True)
     # plot_results(data[:, 1])
