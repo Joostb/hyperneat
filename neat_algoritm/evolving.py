@@ -6,7 +6,7 @@ from neat_algoritm.algorithm import distance, crossover
 from tqdm import tqdm
 
 
-def evolve(genomes, representatives, innovation_number, delta_t=3.0):
+def evolve(genomes, representatives, innovation_number, global_fitness, delta_t=3.0):
     species = [[] for _ in representatives]
 
     children = []
@@ -31,9 +31,23 @@ def evolve(genomes, representatives, innovation_number, delta_t=3.0):
 
     # remove empty species if they exist
     species = list(filter(lambda sp: sp != [], species))
+    
+    #check if stagnation 
+    if total_fitness > global_fitness[0] :
+        global_fitness[0] = total_fitness
+    else:
+        if global_fitness[1] > 15:
+            species = stagnation(species, total_fitness)
+            global_fitness[1] = 0
+        else:
+            global_fitness[1] += 1
 
     strong_species = []
-    allowed_offsprings = new_species_size(species, pop_size, total_fitness)
+    
+    if len(species) > 5:
+        champions = select_champions(species)
+        
+    allowed_offsprings = new_species_size(species, pop_size - len(champions), total_fitness)
 
     # crossover
     for idx, specy in enumerate(species):
@@ -68,11 +82,11 @@ def evolve(genomes, representatives, innovation_number, delta_t=3.0):
             if np.random.rand() < 0.8:
                 genome.mutate_weights()
             #
-            if np.random.rand() < 0.03:
+            if np.random.rand() < 0.2:
                 genome.add_node(innovation_number)
                 innovation_number += 2
 
-            if np.random.rand() < 0.05:
+            if np.random.rand() < 0.2:
                 genome.add_connection(innovation_number)
                 innovation_number += 1
 
@@ -80,11 +94,14 @@ def evolve(genomes, representatives, innovation_number, delta_t=3.0):
     n_parent = sum([len(s) for s in strong_species])
 
     # getting new representatives
-    representatives = [s[0] for s in filter(lambda s: s != [], strong_species)]
+    #representatives = [s[0] for s in filter(lambda s: s != [], strong_species)]
 
     new_genomes = children
+    new_genomes += champions
     for specy in strong_species:
         new_genomes += specy
+    
+        
 
     # create new generation
     genomes = new_genomes
@@ -99,7 +116,7 @@ def evolve(genomes, representatives, innovation_number, delta_t=3.0):
     print('species')
     print(len(species))
 
-    return genomes, representatives, innovation_number
+    return genomes, representatives, innovation_number, global_fitness
 
     if len(species) > 1:
         print('>1 species')
@@ -130,8 +147,6 @@ def new_species_size(species, total, total_fitness):
         else:
             allowed_offsprings[0] -= 1
 
-
-
     if sum(allowed_offsprings) != total:
         print('error')
 
@@ -139,21 +154,46 @@ def new_species_size(species, total, total_fitness):
 
 
 def eliminate_weakest(specy, percentage=0.25):
+    percentage = 0.5
     sort = sorted(specy, key=lambda g: g.fitness_number)
 
     # eliminate weakest 25%
     return sort[int(len(sort) * percentage):]
 
-
-# def fitness(genome):
-#     pass
-#
-#
-# def fitness_sharing(specy, genome, threshold):
-#     sharing_function = len(specy)
-#
-#     return fitness(genome) / sharing_function
-
+def fitness_specy(specy, total_fitness):
+    return sum([g.fitness_number for g in specy]) / total_fitness
+    
+def stagnation(species, total_fitness):
+    reproductible_species = []
+    
+    for idx, specy in enumerate(species):
+        if idx == 0 or idx == 1:
+            reproductible_species.append(specy)
+        else: 
+            s_fitness = fitness_specy(specy, total_fitness) 
+            if s_fitness > fitness_specy(reproductible_species[0], total_fitness):
+                del reproductible_species[0]
+                reproductible_species.append(specy)
+            else: 
+                if s_fitness > fitness_specy(reproductible_species[1], total_fitness):
+                    del reproductible_species[1]
+                    reproductible_species.append(specy)
+                    
+    return reproductible_species
+    
+def select_champions(species):
+    
+    champions = []
+    for specy in species: 
+        fitness = 0 
+        champion = None
+        for g in specy: 
+            if g.fitness_number > fitness: 
+                champion = g
+                fitness = g.fitness_number
+        champions.append(champion)
+                
+    return champions
 
 if __name__ == '__main__':
     evolve()

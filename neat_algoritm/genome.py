@@ -92,7 +92,6 @@ class Genome:
 
     def mutate_weights(self):
 
-
         for gene in self.genes:
             # we want the updates to be gaussian noise, not uniform
             # since big changes radically change the 'meanng
@@ -104,14 +103,15 @@ class Genome:
 
     def evaluate_input(self, inputs, steps=2):
 
-
+        
         new_activations = self.neuron_activations  # By reference, no need to set it again
         # new_activations[:len(inputs)] = inputs
         new_activations[:len(inputs)] += inputs
 
-        for i in range(steps):
-            new_activations = self.step_network_evaluation(self.input_neurons, new_activations)
-            # new_activations = self.step_network_evaluation(self.hidden_neurons, new_activations)
+        #for i in range(steps):
+        new_activations = self.step_network_evaluation(self.input_neurons, new_activations)
+        
+        #new_activations = self.step_network_evaluation(self.hidden_neurons, new_activations)
 
         output_layer = new_activations[self.output_neurons]
 
@@ -122,31 +122,42 @@ class Genome:
         # todo: debug this function
         # here we want to calculate the new activations for all neurons, based on the old activations.
         
-#        print(input_neurons)
-#        print(activations)
-        network_new = np.zeros(shape=activations.shape)
-#        print(network_new.shape)
-#        [print(g) for g in self.genes]
-#        print(self.nodes)
+#        network_new = np.zeros(shape=activations.shape)
+#        
+#        for gene in self.genes:
+#            #print(gene.out)
+#            network_new[gene.out] += activations[gene.in_node] * gene.weight * gene.enabled
+#
+#        # numpy can apply the function elementwise, without looping!
+#        return activation_function(network_new)
         
-        for gene in self.genes:
-            #print(gene.out)
-            network_new[gene.out] += activations[gene.in_node] * gene.weight * gene.enabled
-
-        # numpy can apply the function elementwise, without looping!
+        network_new = np.zeros(shape=activations.shape)
+        
+        for node in self.nodes:
+            if node[1] == 'sensor':
+                network_new[node[0]] = activations[node[0]]
+            else:
+                if node[1] == 'hidden':
+                    connections = []
+                    for gene in self.genes:
+                        if node[0] == gene.out:
+                            connections.append(gene)
+                            
+                    for connection in connections:
+                        network_new[node[0]] += activations[gene.in_node] * connection.weight * connection.enabled
+        
+        for node in self.nodes:
+            if node[1] == 'output':
+                connections = []
+                for gene in self.genes:
+                    if node[0] == gene.out:
+                        connections.append(gene)
+                        
+                for connection in connections:
+                    network_new[node[0]] += activations[gene.in_node] * connection.weight * connection.enabled
+        
+        
         return activation_function(network_new)
-
-        ## WRONG ##
-        ## genes denote connections **between** neurons, not neurons themselves
-
-        for neuron in input_neurons:
-            gene = self.genes[neuron]
-            activations[gene.out] += activations[gene.in_node] * gene.weight * gene.enabled
-
-        for out_neuron in set([self.genes[neuron].out for neuron in input_neurons]):
-            activations[out_neuron] = activation_function(activations[out_neuron])
-
-        return activations
 
     def reset_activations(self):
         self.neuron_activations = np.zeros(shape=(len(self.nodes),))
