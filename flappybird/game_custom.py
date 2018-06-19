@@ -3,19 +3,12 @@ import neat
 import pygame
 from numpy.random import choice
 
-
 FPS = 200
 SCREENWIDTH = 288
 SCREENHEIGHT = 512
 # amount by which base can maximum shift to left
 PIPEGAPSIZE = 160  # gap between upper and lower part of pipe
 BASEY = SCREENHEIGHT * 0.79
-
-BACKGROUND = pygame.image.load('./assets/background.png')
-
-GENERATION = 0
-MAX_FITNESS = 0
-BEST_GENOME = 0
 
 
 class Bird(pygame.sprite.Sprite):
@@ -24,7 +17,7 @@ class Bird(pygame.sprite.Sprite):
 
         pygame.sprite.Sprite.__init__(self)
 
-        self.image = pygame.image.load('./assets/redbird.png')
+        self.image = pygame.image.load('./flappybird/assets/redbird.png')
 
         self.x = int(SCREENWIDTH * 0.2)
         self.y = SCREENHEIGHT * 0.5
@@ -83,8 +76,8 @@ class Pipe(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
         self.screen = screen
-        self.lowerBlock = PipeBlock('./assets/pipe-red.png', False)
-        self.upperBlock = PipeBlock('./assets/pipe-red.png', True)
+        self.lowerBlock = PipeBlock('./flappybird/assets/pipe-red.png', False)
+        self.upperBlock = PipeBlock('./flappybird/assets/pipe-red.png', True)
 
         self.pipeWidth = self.upperBlock.rect.width
         self.x = x
@@ -129,7 +122,9 @@ class Pipe(pygame.sprite.Sprite):
         return ([self.x + (self.pipeWidth / 2), self.upperY, self.lowerY])
 
 
-def game(genome, config):
+def game(genome, config, display_screen=True):
+    BACKGROUND = pygame.image.load('./flappybird/assets/background.png') if display_screen else None
+
     net = neat.nn.FeedForwardNetwork.create(genome, config)
 
     pygame.init()
@@ -150,16 +145,13 @@ def game(genome, config):
     pipeGroup.add(pipe1.lowerBlock)
     pipeGroup.add(pipe2.lowerBlock)
 
-    # birdGroup = pygame.sprite.Group()
-    # birdGroup.add(bird1)
-
     moved = False
 
     time = 0
 
     while True:
-
-        DISPLAY.blit(BACKGROUND, (0, 0))
+        if display_screen:
+            DISPLAY.blit(BACKGROUND, (0, 0))
 
         if (pipe1.x < pipe2.x and pipe1.behindBird == 0) or (pipe2.x < pipe1.x and pipe2.behindBird == 1):
             input = (bird.y, pipe1.x, pipe1.upperY, pipe1.lowerY)
@@ -176,23 +168,18 @@ def game(genome, config):
 
         t = pygame.sprite.spritecollideany(bird, pipeGroup)
 
-        if t != None or (bird.y == 512 - bird.height) or (bird.y == 0):
+        if t is not None or (bird.y == 512 - bird.height) or (bird.y == 0):
             # print("GAME OVER")
             # print("FINAL SCORE IS %d"%fitness)
-            return (fitness)
+            return fitness, SCORE / 10
 
         output = net.activate(input)
-
-        # for event in pygame.event.get():
-        # 	if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-        # 		pygame.quit()
-        # 		sys.exit()
 
         if output[0] >= 0.5:
             bird.move("UP")
             moved = True
 
-        if moved == False:
+        if not moved:
             bird.move(None)
         else:
             moved = False
@@ -202,14 +189,15 @@ def game(genome, config):
             if pipe1.behindBird == 0:
                 pipe1.behindBird = 1
                 SCORE += 10
-                print("SCORE IS %d" % (SCORE/10))
+                # print("SCORE IS %d" % (SCORE / 10))
 
         pipe2Pos = pipe2.move()
         if pipe2Pos[0] <= int(SCREENWIDTH * 0.2) - int(bird.rect.width / 2):
             if pipe2.behindBird == 0:
                 pipe2.behindBird = 1
                 SCORE += 10
-                print("SCORE IS %d" % (SCORE/10))
+                # print("SCORE IS %d" % (SCORE / 10))
 
-        # pygame.display.update()
+        if display_screen:
+            pygame.display.update()
         FPSCLOCK.tick(FPS)
