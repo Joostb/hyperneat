@@ -44,7 +44,7 @@ def play_flappy():
 
 
 def train_flappy_features(begin_epoch=0, begin_epsilon=1.0):
-    game = FlappyGame(return_rgb=False, display_screen=False, frame_skip=2, reward_clipping=True)
+    game = FlappyGame(return_rgb=False, display_screen=False, frame_skip=2, reward_clipping=True, leave_out_next_next=True)
     s_t = np.array(normalize_state(game.get_state()))
 
     n_features = len(s_t)
@@ -111,7 +111,7 @@ if __name__ == "__main__":
             log_file = open("log.csv", "w")
             log_file.write("game, score, epsilon, loss\n")
             begin_epoch = 0
-            begin_epsilon = 1.0
+            begin_epsilon = 0.2
 
         WARM_UP = 1000
         BATCH_SIZE = 32

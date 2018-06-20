@@ -2,6 +2,7 @@ import keras.layers as L
 from keras import Model
 from keras.utils import plot_model
 
+
 def deep_q_network(input_shape, n_actions=2):
     input = L.Input(shape=input_shape)
 
@@ -40,7 +41,7 @@ def feature_q_network_conv(input_shape=(4, 8), n_actions=2):
 
 
 def feature_q_network_dense(input_shape=(8,), n_actions=2):
-    input = L.Input(batch_shape=(32, 8), name="features")
+    input = L.Input(shape=input_shape, name="features")
 
     x = L.Dense(32, activation="relu", name="fc1")(input)
     x = L.BatchNormalization(name="bn_1")(x)
