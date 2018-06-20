@@ -1,12 +1,17 @@
 import numpy as np
 
-from neat_algoritm.genome import Genome
-from visualization.visualization import plot_genome
 from neat_algoritm.algorithm import distance, crossover
-from tqdm import tqdm
 
 
-def evolve(genomes, representatives, innovation_number, global_fitness, delta_t=3.0):
+def evolve(genomes, representatives, innovation_number, delta_t=3.0):
+    """
+    Main algorithm for evoling a population
+    :param genomes:
+    :param representatives:
+    :param innovation_number:
+    :param delta_t:
+    :return:
+    """
     species = [[] for _ in representatives]
 
     children = []
@@ -33,21 +38,18 @@ def evolve(genomes, representatives, innovation_number, global_fitness, delta_t=
     species = list(filter(lambda sp: sp != [], species))
     
     #check if stagnation 
-    if total_fitness > global_fitness[0] :
-        global_fitness[0] = total_fitness
-    else:
-        if global_fitness[1] > 15:
-            species = stagnation(species, total_fitness)
-            global_fitness[1] = 0
-        else:
-            global_fitness[1] += 1
+#    if total_fitness > global_fitness[0] :
+#        global_fitness[0] = total_fitness
+#    else:
+#        if global_fitness[1] > 15:
+#            species = stagnation(species, total_fitness)
+#            global_fitness[1] = 0
+#        else:
+#            global_fitness[1] += 1
 
     strong_species = []
-    
-    if len(species) > 5:
-        champions = select_champions(species)
         
-    allowed_offsprings = new_species_size(species, pop_size - len(champions), total_fitness)
+    allowed_offsprings = new_species_size(species, pop_size, total_fitness)
 
     # crossover
     for idx, specy in enumerate(species):
@@ -74,8 +76,6 @@ def evolve(genomes, representatives, innovation_number, global_fitness, delta_t=
                 parent_2 = np.random.choice(strong)
                 children.append(crossover(parent_1, parent_2, parent_1.fitness_number, parent_2.fitness_number))
 
-    # genome_fitness = [fitness(g) for g in genomes]
-
     # mutation
     for specy in strong_species:
         for genome in specy:
@@ -90,14 +90,10 @@ def evolve(genomes, representatives, innovation_number, global_fitness, delta_t=
                 genome.add_connection(innovation_number)
                 innovation_number += 1
 
-    n_child = len(children)
-    n_parent = sum([len(s) for s in strong_species])
-
     # getting new representatives
-    #representatives = [s[0] for s in filter(lambda s: s != [], strong_species)]
+    representatives = [s[0] for s in filter(lambda s: s != [], strong_species)]
 
     new_genomes = children
-    new_genomes += champions
     for specy in strong_species:
         new_genomes += specy
     
@@ -105,35 +101,25 @@ def evolve(genomes, representatives, innovation_number, global_fitness, delta_t=
 
     # create new generation
     genomes = new_genomes
-
+    #print informations each generations 
     print('--------------')
-
     print('genomes')
     print(len(genomes))
-
     print('average size', sum([len(g.genes) for g in genomes]) / len(genomes))
-
     print('species')
     print(len(species))
 
-    return genomes, representatives, innovation_number, global_fitness
-
-    if len(species) > 1:
-        print('>1 species')
-
-    print('--------------')
-
-    print('genomes')
-    print(len(genomes))
-    print(len(genomes[10].genes))
-    print(len(genomes[40].genes))
-    print(len(genomes[90].genes))
-    print('species')
-    print(len(species))
+    return genomes, representatives, innovation_number
 
 
 def new_species_size(species, total, total_fitness):
-
+    """
+    Calculate the number of genome per species going to the next generation without mutations
+    :species:
+    :total:
+    :total_fitness:
+    :return:
+    """
     allowed_offsprings = []
 
     for idx, specy in enumerate(species):
@@ -154,6 +140,12 @@ def new_species_size(species, total, total_fitness):
 
 
 def eliminate_weakest(specy, percentage=0.25):
+    """
+    Eliminate a certain percentage of genome per species
+    :specy:
+    :percentage:
+    :return:
+    """
     percentage = 0.5
     sort = sorted(specy, key=lambda g: g.fitness_number)
 
@@ -161,9 +153,21 @@ def eliminate_weakest(specy, percentage=0.25):
     return sort[int(len(sort) * percentage):]
 
 def fitness_specy(specy, total_fitness):
+    """
+    Calculate the fitness of genomes per species according the global fitness 
+    :specy:
+    :total_fitness:
+    :return:
+    """
     return sum([g.fitness_number for g in specy]) / total_fitness
     
 def stagnation(species, total_fitness):
+    """
+    Select the 2 best species (allowed to reproduce) because of stagnation
+    :species:
+    :total_fitness:
+    :return:
+    """
     reproductible_species = []
     
     for idx, specy in enumerate(species):
@@ -180,20 +184,6 @@ def stagnation(species, total_fitness):
                     reproductible_species.append(specy)
                     
     return reproductible_species
-    
-def select_champions(species):
-    
-    champions = []
-    for specy in species: 
-        fitness = 0 
-        champion = None
-        for g in specy: 
-            if g.fitness_number > fitness: 
-                champion = g
-                fitness = g.fitness_number
-        champions.append(champion)
-                
-    return champions
 
 if __name__ == '__main__':
     evolve()
