@@ -118,7 +118,7 @@ class Pipe(pygame.sprite.Sprite):
             self.behindBird = 0
 
         self.display()
-        return ([self.x + (self.pipeWidth / 2), self.upperY, self.lowerY])
+        return [self.x + (self.pipeWidth / 2), self.upperY, self.lowerY]
 
 
 def game(genome, config, display_screen=True):
@@ -200,3 +200,91 @@ def game(genome, config, display_screen=True):
         if display_screen:
             pygame.display.update()
         FPSCLOCK.tick(FPS)
+
+# class FlappyGame:
+#     def __init__(self, display_screen=True, genome=None, config=None):
+#         self.display_screen = display_screen
+#
+#         self.BACKGROUND = pygame.image.load('./flappybird/assets/background.png') if display_screen else None
+#
+#         if genome is not None:
+#             self.net = neat.nn.FeedForwardNetwork.create(genome, config)
+#
+#         pygame.init()
+#
+#         self.FPSCLOCK = pygame.time.Clock()
+#         self.DISPLAY = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
+#
+#         pygame.display.set_caption('Flappy Bird')
+#
+#         self.SCORE = 0
+#
+#         self.bird = Bird(self.DISPLAY)
+#         self.pipe1 = Pipe(self.DISPLAY, SCREENWIDTH - 10)
+#         self.pipe2 = Pipe(self.DISPLAY, SCREENWIDTH - 10 + (SCREENWIDTH / 2))
+#
+#         self.pipeGroup = pygame.sprite.Group()
+#         self.pipeGroup.add(self.pipe1.upperBlock)
+#         self.pipeGroup.add(self.pipe2.upperBlock)
+#         self.pipeGroup.add(self.pipe1.lowerBlock)
+#         self.pipeGroup.add(self.pipe2.lowerBlock)
+#
+#         self.moved = False
+#
+#         self.time = 0
+#
+#     def get_state(self):
+#         if self.display_screen:
+#             self.DISPLAY.blit(self.BACKGROUND, (0, 0))
+#
+#         if (self.pipe1.x < self.pipe2.x and self.pipe1.behindBird == 0) or \
+#                 (self.pipe2.x < self.pipe1.x and self.pipe2.behindBird == 1):
+#             self.input = (self.bird.y, self.pipe1.x, self.pipe1.upperY, self.pipe1.lowerY)
+#             self.centerY = (self.pipe1.upperY + self.pipe1.lowerY) / 2
+#         elif (self.pipe1.x < self.pipe2.x and self.pipe1.behindBird == 1) or \
+#                 (self.pipe2.x < self.pipe1.x and self.pipe2.behindBird == 0):
+#             self.input = (self.bird.y, self.pipe2.x, self.pipe2.upperY, self.pipe2.lowerY)
+#             self.centerY = (self.pipe2.upperY + self.pipe2.lowerY) / 2
+#         return self.input
+#
+#     def act(self, Q):
+#         # print(input)
+#         vertDist = (((self.bird.y - self.centerY) ** 2) * 100) / (512 * 512)
+#         self.time += 1
+#
+#         fitness = self.SCORE - vertDist + (self.time / 10.0)
+#
+#         t = pygame.sprite.spritecollideany(self.bird, self.pipeGroup)
+#
+#         if t is not None or (self.bird.y == 512 - self.bird.height) or (self.bird.y == 0):
+#             # print("GAME OVER")
+#             # print("FINAL SCORE IS %d"%fitness)
+#             return fitness, self.SCORE / 10
+#
+#
+#         if Q >= 0.5:
+#             bird.move("UP")
+#             moved = True
+#
+#         if not moved:
+#             bird.move(None)
+#         else:
+#             moved = False
+#
+#         pipe1Pos = pipe1.move()
+#         if pipe1Pos[0] <= int(SCREENWIDTH * 0.2) - int(bird.rect.width / 2):
+#             if pipe1.behindBird == 0:
+#                 pipe1.behindBird = 1
+#                 SCORE += 10
+#                 # print("SCORE IS %d" % (SCORE / 10))
+#
+#         pipe2Pos = pipe2.move()
+#         if pipe2Pos[0] <= int(SCREENWIDTH * 0.2) - int(bird.rect.width / 2):
+#             if pipe2.behindBird == 0:
+#                 pipe2.behindBird = 1
+#                 SCORE += 10
+#                 # print("SCORE IS %d" % (SCORE / 10))
+#
+#         if display_screen:
+#             pygame.display.update()
+#         FPSCLOCK.tick(FPS)

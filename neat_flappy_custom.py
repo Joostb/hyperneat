@@ -42,7 +42,8 @@ def run(config_file):
     fitness, score = game(winner, config, display_screen=True)
     print("\tFitness: {} \n\tScore: {}".format(fitness, score))
 
-    visualize.draw_net(config, winner)
+    visualize.draw_net(config, winner, view=True,
+                       node_names={-1: 'y_flappy', -2: 'dist_pipe', -3: "y_top_pipe", -4: "y_bottom_pipe", 0: 'flap'})
     visualize.plot_stats(stats, ylog=False, view=True)
     visualize.plot_species(stats, view=True)
 
