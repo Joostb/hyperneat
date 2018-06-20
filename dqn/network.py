@@ -1,6 +1,6 @@
 import keras.layers as L
 from keras import Model
-
+from keras.utils import plot_model
 
 def deep_q_network(input_shape, n_actions=2):
     input = L.Input(shape=input_shape)
@@ -40,13 +40,18 @@ def feature_q_network_conv(input_shape=(4, 8), n_actions=2):
 
 
 def feature_q_network_dense(input_shape=(8,), n_actions=2):
-    input = L.Input(shape=input_shape)
+    input = L.Input(batch_shape=(32, 8), name="features")
 
-    x = L.Dense(32, activation="relu")(input)
-    x = L.Dense(64, activation="relu")(x)
-    x = L.Dense(32, activation="linear")(x)
+    x = L.Dense(32, activation="relu", name="fc1")(input)
+    x = L.BatchNormalization(name="bn_1")(x)
 
-    output = L.Dense(n_actions)(x)
+    x = L.Dense(64, activation="relu", name="fc2")(x)
+    x = L.BatchNormalization(name="bn_2")(x)
+
+    x = L.Dense(32, activation="linear", name="fc3")(x)
+    x = L.BatchNormalization(name="bn3")(x)
+
+    output = L.Dense(n_actions, name="Q_Layer")(x)
 
     model = Model(inputs=[input], outputs=[output])
     model.summary()
@@ -55,6 +60,7 @@ def feature_q_network_dense(input_shape=(8,), n_actions=2):
 
 
 if __name__ == "__main__":
-    deep_q_network((4, 84, 84), n_actions=2)
-    feature_q_network_conv((4, 8), n_actions=2)
-    feature_q_network_dense()
+    # deep_q_network((4, 84, 84), n_actions=2)
+    # feature_q_network_conv((4, 8), n_actions=2)
+    model = feature_q_network_dense()
+    plot_model(model, to_file="../results/feature_q_network.png", show_shapes=True, rankdir="LR")
