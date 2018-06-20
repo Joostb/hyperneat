@@ -1,3 +1,5 @@
+import pickle
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -5,7 +7,7 @@ import numpy as np
 def plot_results(data):
     plt.figure()
     plt.plot(np.arange(1, len(data)+1), data)
-    plt.ylabel("Fitness")
+    plt.ylabel("Score")
     plt.xlabel("Game")
 
     plt.show()
@@ -14,7 +16,7 @@ def plot_results(data):
 def plot_smoothed_results(data):
     N = len(data)
 
-    smooth_scale = 3
+    smooth_scale = 0
 
     data_smoothed = []
     for index, d in enumerate(data):
@@ -26,11 +28,11 @@ def plot_smoothed_results(data):
     xlabels = np.linspace(0, N, len(data_smoothed))
 
     # plt.plot(xlabels, data_smoothed, label="smoothed rewards")
-    plt.plot(xlabels, p(np.linspace(0, len(data), len(data))), label="smoothed reward")
-    plt.plot(xlabels, data, label="Actual")
+    plt.plot(xlabels, p(np.linspace(0, len(data), len(data))), label="polynomial fit")
+    plt.plot(xlabels, data, label="Score")
     plt.xlabel("Game")
     plt.ylabel("Fitness")
-    plt.legend(loc="lower right")
+    plt.legend(loc=0)
     plt.show()
 
 
@@ -55,5 +57,10 @@ def plot_neat(data, label="fitness"):
 
 if __name__ == "__main__":
     data = np.genfromtxt("log.csv", dtype=float, delimiter=',', skip_header=True)
-    # plot_results(data[:, 1])
-    plot_smoothed_results(data[:, 1])
+    plot_results(data[:, 1])
+    # plot_smoothed_results(data[:, 1])
+    # data = pickle.load(open("results/fitnesses.pkl", "rb"))
+    # plot_neat(data, label="fitness")
+
+    # data = pickle.load(open("results/scores.pkl", "rb"))
+    # plot_neat(data, label="score")
