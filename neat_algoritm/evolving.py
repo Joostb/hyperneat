@@ -101,7 +101,7 @@ def evolve(genomes, representatives, innovation_number, delta_t=3.0):
 
     # create new generation
     genomes = new_genomes
-    #print informations each generations 
+    #print informations each generations
     print('--------------')
     print('genomes')
     print(len(genomes))
@@ -154,7 +154,7 @@ def eliminate_weakest(specy, percentage=0.25):
 
 def fitness_specy(specy, total_fitness):
     """
-    Calculate the fitness of genomes per species according the global fitness 
+    Calculate the fitness of genomes per species according the global fitness
     :specy:
     :total_fitness:
     :return:

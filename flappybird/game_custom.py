@@ -6,7 +6,6 @@ from numpy.random import choice
 FPS = 200
 SCREENWIDTH = 288
 SCREENHEIGHT = 512
-# amount by which base can maximum shift to left
 PIPEGAPSIZE = 160  # gap between upper and lower part of pipe
 BASEY = SCREENHEIGHT * 0.79
 
@@ -42,7 +41,7 @@ class Bird(pygame.sprite.Sprite):
 
     def move(self, input):
 
-        if input != None:
+        if input is not None:
             self.playerVelY = self.playerFlapAcc
             self.playerFlapped = True
 
@@ -62,7 +61,7 @@ class PipeBlock(pygame.sprite.Sprite):
 
         pygame.sprite.Sprite.__init__(self)
 
-        if upper == False:
+        if not upper:
             self.image = pygame.image.load(image)
         else:
             self.image = pygame.transform.rotate(pygame.image.load(image), 180)

@@ -36,7 +36,7 @@ def run(config_file):
     p.add_reporter(stats)
     p.add_reporter(neat.Checkpointer(5))
 
-    winner = p.run(eval_genomes, 15)
+    winner = p.run(eval_genomes, 50)
 
     print("\n Best Genome: \n{}".format(winner))
     fitness, score = game(winner, config, display_screen=True)
