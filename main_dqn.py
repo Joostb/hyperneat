@@ -1,12 +1,11 @@
 import random
 from collections import deque
 
-import numpy as np
-from keras import optimizers
 import keras
+import numpy as np
 
-from dqn.network import feature_q_network_conv
 from flappybird.game import FlappyGame, normalize_state
+
 
 def train_flappy_features():
     game = FlappyGame(return_rgb=True, display_screen=False, frame_skip=FRAMES_PER_ACTION, reward_clipping=True)
@@ -93,6 +92,8 @@ def train_flappy_features():
 
 
 if __name__ == "__main__":
+    raise DeprecationWarning("This file should not be ran")
+
     GAMMA = 0.9
     WARM_UP = 3200
     FINAL_EPSILON = 0.0001
