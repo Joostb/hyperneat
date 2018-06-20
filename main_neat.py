@@ -17,8 +17,6 @@ def evolve_flappy():
 
     innovation_number = n_features * n_actions + 1
     representatives = []
-    
-    global_fitness = [0,0]
 
     population = [Genome() for _ in range(population_size)]
     for genome in population:
@@ -65,7 +63,7 @@ def evolve_flappy():
         epoch_values.append(np.array(genome_values))
 
         print('crossing and mutating genes')
-        population, representatives, innovation_number, global_fitness = evolve(population, representatives, innovation_number, global_fitness)
+        population, representatives, innovation_number = evolve(population, representatives, innovation_number)
 
         print('generation ', _)
         print("Best Epoch Fitness:", best_fitness)

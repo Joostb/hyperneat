@@ -7,6 +7,14 @@ from visualization.visualization import plot_genome
 
 
 def crossover(parent_1, parent_2, fitness_1, fitness_2):
+    """
+    Crossover between two genomes 
+    :param parent_1:
+    :param parent_2:
+    :param fitness_1:
+    :param fitness_2:
+    :return:
+    """
     # determine the fittest parent
     if fitness_2 > fitness_1:
         fit_parent = deepcopy(parent_2)
@@ -15,8 +23,6 @@ def crossover(parent_1, parent_2, fitness_1, fitness_2):
 
     child_genes = cross_genes(parent_1, parent_2)
         
-
-    # how do we know the nodes?
     child_nodes = generate_nodes(child_genes, parent_1, parent_2)
 
     child_genome = Genome()
@@ -28,7 +34,6 @@ def crossover(parent_1, parent_2, fitness_1, fitness_2):
     for i, node in enumerate(child_nodes):
         if node[1] == 'sensor':
             child_genome.input_neurons.append(i)
-
         elif node[1] is 'output':
             child_genome.output_neurons.append(i)
         elif node[1] is 'hidden':
@@ -42,8 +47,8 @@ def crossover(parent_1, parent_2, fitness_1, fitness_2):
 def generate_nodes(genes, parent_1, parent_2):
     """
     Loop through all genes, and find out what nodes are used, and their type
-
-    :param genome:
+    :param parent_1:
+    :param parent_2:
     :return:
     """
     nodes = []
@@ -78,8 +83,12 @@ def generate_nodes(genes, parent_1, parent_2):
 
 
 def cross_genes(parent_1: Genome, parent_2: Genome):
-    # assume p_1 is the fittest parent
-    # this function tries to cross parent 1 and 2 into a new child!
+    """
+    Cross the gene of parent_1 and parent_2 into a new child
+    :param parent_1:
+    :param parent_2:
+    :return:
+    """
 
     # for more understanding, please see figure 4, that should explain a lot
     p_1 = 0
@@ -193,61 +202,18 @@ def distance(parent_1, parent_2, c_1=1.0, c_2=1.0, c_3=3.0):
 if __name__ == "__main__":
     genome = Genome()
     genome.initialize(3, 2)
-    
-    genome.add_node(20)
-    genome.add_connection(22)
-
-
-    genome_2 = Genome()
-    genome_2.initialize(3, 2)
-    genome_2.add_connection(25)
-    genome_2.add_connection(28)
-    genome_2.add_node(50)
-
-    print(delta(genome, genome_2))
-
-    #plot_genome(genome_2)
-    
-    # child = crossover(genome, genome_2, 0.5, 0.5)
-    #
-    # plot_genome(child)
-    # print('parent 1')
-    # ([print(gene) for gene in genome.genes])
-    # ([print(gene) for gene in genome.nodes])
-    # print('parent 2')
-    # ([print(gene) for gene in genome_2.genes])
-    # ([print(gene) for gene in genome_2.nodes])
-    # print('child')
-    # ([print(gene) for gene in child.genes])
-    # ([print(gene) for gene in child.nodes])
-    
-    '''genome = Genome()
-    genome.initialize(6, 5)
+    genome.add_node(12)
+    genome.add_connection(18)
     plot_genome(genome)
 
     genome_2 = Genome()
-    genome_2.initialize(6, 5)
+    genome_2.initialize(3, 2)
+    genome_2.add_node(13)
+    genome_2.add_connection(19)
+    genome_2.add_node(14)
+    genome_2.add_connection(20)
+    plot_genome(genome_2)
 
-    innovation_number = genome_2.innovation_number
-
-    for i in range(3):
-        genome.add_connection(innovation_number)
-        innovation_number += 1
-
-    genome.add_node(innovation_number)
-
-    cross_genes(genome_2, genome)
-
-    print('network')
-    inputs = np.random.normal(size=(5,))
-    print(inputs)
-    print(genome.evaluate_input(inputs))
-
-    # print(genome.nodes)
-    # print(genome.innovation_number)
-    # # print((genome.genes))
-    ([print(gene) for gene in genome.genes])'''
-
-    # todo complete the crossover step, and check if it works
-    # todo crossover
-    # todo network evaluation
+    child = crossover(genome, genome_2, 0.5, 0.5)
+    plot_genome(child)
+    

@@ -26,9 +26,6 @@ def plot_genome(genome: Genome):
             color_map.append(2)
 
         G.add_node(node[0])
-        
-
-
 
     for gene in genome.genes:
         if gene.enabled:

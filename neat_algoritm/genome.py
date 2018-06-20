@@ -59,6 +59,11 @@ class Genome:
         return self.innovation_number - 1
 
     def add_connection(self, innovation_number):
+        """
+        Add a connection to the genome
+        :innovation_number:
+        :return:
+        """
 
         out_node = np.random.choice(len(self.nodes))
 
@@ -66,14 +71,34 @@ class Genome:
         nodes = np.random.permutation(nodes)
 
         for index, in_node in nodes:
-
             for gene in self.genes:
-                if gene.in_node != index and in_node[1] != 'sensor':  # can there be loops 4 -> 4
+                if gene.in_node != index and in_node != 'sensor' and self.connection_exist(gene.in_node, out_node) == False:  
                     new_gene = Gene(int(index), out_node, np.random.normal(), True, innovation_number)
                     self.genes.append(new_gene)
                     return new_gene
+                
+        return None
+                
+    def connection_exist(self, in_node, out_node):
+        """
+        Check if a connection between two nodes alredy exist or not
+        :in_node:
+        :out_node:
+        :return:
+        """
+        for gene in self.genes: 
+            if gene.in_node == in_node and gene.out == out_node:
+                return True 
+            if gene.in_node == out_node and gene.out == in_node:
+                return True
+        return False
 
     def add_node(self, innovation_number):
+        """
+        Add a node to the genome
+        :innovation_number:
+        :return:
+        """
         connection = np.random.choice(self.genes)
         connection.enabled = False
 
@@ -91,6 +116,9 @@ class Genome:
         return new_gene_in, new_gene_out
 
     def mutate_weights(self):
+        """
+        Mutate the weight according some percentage
+        """
 
         for gene in self.genes:
             # we want the updates to be gaussian noise, not uniform
@@ -102,35 +130,30 @@ class Genome:
                 gene.weight = random_update
 
     def evaluate_input(self, inputs, steps=2):
-
+        """
+        To evaluate the network and return the activation number of the output
+        :inputs:
+        :step:
+        :return:
+        """
         
         new_activations = self.neuron_activations  # By reference, no need to set it again
-        # new_activations[:len(inputs)] = inputs
         new_activations[:len(inputs)] += inputs
 
-        #for i in range(steps):
         new_activations = self.step_network_evaluation(self.input_neurons, new_activations)
         
-        #new_activations = self.step_network_evaluation(self.hidden_neurons, new_activations)
-
         output_layer = new_activations[self.output_neurons]
 
         return output_layer
 
     def step_network_evaluation(self, input_neurons, activations, activation_function=sigmoid):
-
-        # todo: debug this function
-        # here we want to calculate the new activations for all neurons, based on the old activations.
-        
-#        network_new = np.zeros(shape=activations.shape)
-#        
-#        for gene in self.genes:
-#            #print(gene.out)
-#            network_new[gene.out] += activations[gene.in_node] * gene.weight * gene.enabled
-#
-#        # numpy can apply the function elementwise, without looping!
-#        return activation_function(network_new)
-        
+        """
+        Perfom the evaluation of the network
+        :input_neurons:
+        :activations:
+        :activation_function:
+        :return:
+        """
         network_new = np.zeros(shape=activations.shape)
         
         for node in self.nodes:
